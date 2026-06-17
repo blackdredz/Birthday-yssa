@@ -1,0 +1,1002 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>A Little Something For You ♡</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,600&family=Nunito:wght@400;500;600;700&family=Patrick+Hand&display=swap" rel="stylesheet">
+<style>
+:root {
+  --cream:   #FDF4EE;
+  --blush:   #FCEAF2;
+  --petal:   #F9DAE7;
+  --accent:  #D4698A;
+  --accent-l:#EFC0D0;
+  --accent-d:#A94A6A;
+  --lavender:#C3B8E8;
+  --ink:     #5A3048;
+  --white:   #FFFCF9;
+
+  --ff-display:'Cormorant Garamond',Georgia,serif;
+  --ff-hand:   'Patrick Hand',cursive;
+  --ff-ui:     'Nunito',system-ui,sans-serif;
+
+  --spring: cubic-bezier(.34,1.56,.64,1);
+  --ease:   cubic-bezier(.16,1,.3,1);
+}
+
+*,*::before,*::after { box-sizing:border-box; margin:0; padding:0; }
+html { -webkit-text-size-adjust:100%; }
+
+body {
+  position:relative;
+  min-height:100vh;
+  font-family:var(--ff-hand);
+  color:var(--ink);
+  overflow-x:hidden;
+  background:var(--cream);
+  background-image:
+    radial-gradient(ellipse 80% 55% at 50% -5%, rgba(245,198,216,.35) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 40% at 100% 100%, rgba(195,184,232,.12) 0%, transparent 55%);
+}
+
+/* ── falling petals ───────────────────────────── */
+.petals {
+  position:fixed; inset:0;
+  overflow:hidden;
+  pointer-events:none;
+  z-index:0;
+}
+.petal {
+  position:absolute;
+  top:-8%;
+  border-radius:50% 0 50% 0;
+  will-change:transform;
+  animation:petalFall linear infinite;
+}
+@keyframes petalFall {
+  0%   { transform:translateY(-5vh) translateX(0) rotate(var(--spin,0deg)); opacity:0; }
+  6%   { opacity:var(--o,.32); }
+  88%  { opacity:var(--o,.32); }
+  100% { transform:translateY(108vh) translateX(var(--sway,24px)) rotate(calc(var(--spin,0deg) + 280deg)); opacity:0; }
+}
+
+/* ── corner ribbon borders ────────────────────── */
+.corner-borders {
+  position:fixed; inset:0;
+  pointer-events:none;
+  z-index:0;
+  overflow:hidden;
+}
+.corner-border {
+  position:absolute;
+  width:clamp(110px,26vw,210px);
+  height:auto;
+  opacity:.42;
+}
+.corner-border--br {
+  right:max(0px, env(safe-area-inset-right));
+  bottom:max(0px, env(safe-area-inset-bottom));
+  transform-origin:bottom right;
+}
+.corner-border--bl {
+  left:max(0px, env(safe-area-inset-left));
+  bottom:max(0px, env(safe-area-inset-bottom));
+  transform:scaleX(-1);
+  transform-origin:bottom left;
+}
+.corner-border--tr {
+  right:max(0px, env(safe-area-inset-right));
+  top:max(0px, env(safe-area-inset-top));
+  transform:scaleY(-1);
+  transform-origin:top right;
+}
+.corner-border--tl {
+  left:max(0px, env(safe-area-inset-left));
+  top:max(0px, env(safe-area-inset-top));
+  transform:scale(-1);
+  transform-origin:top left;
+}
+
+button { font-family:inherit; cursor:pointer; border:none; background:none; }
+img    { display:block; max-width:100%; }
+[contenteditable="true"] { cursor:text; border-radius:4px; padding:1px 3px; outline:none; transition:background .2s; }
+[contenteditable="true"]:hover,
+[contenteditable="true"]:focus { background:rgba(212,105,138,.09); }
+.visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+
+/* ── bow images ─────────────────────────────────── */
+.bow-img {
+  display:block; object-fit:contain; object-position:top center;
+  pointer-events:none; user-select:none;
+  -webkit-backface-visibility:hidden;
+  transform:translateZ(0);
+}
+/* crop to just the bow knot — hide long ribbon tails in headers */
+.bow-crop {
+  width:clamp(56px,14vw,80px);
+  height:clamp(50px,12vw,72px);
+  overflow:hidden;
+  display:flex; align-items:flex-start; justify-content:center;
+  flex-shrink:0;
+}
+.bow-crop .bow-img { width:100%; height:auto; }
+
+/* ── layout ─────────────────────────────────────── */
+#app {
+  position:relative; z-index:1;
+  min-height:100vh;
+  display:flex; align-items:center; justify-content:center;
+  padding:48px 28px 40px;
+}
+.screen {
+  display:none; width:100%; max-width:min(680px,94vw);
+  flex-direction:column; align-items:center; text-align:center;
+}
+.screen--hub { max-width:min(760px,96vw); }
+.screen.active { display:flex; animation:rise .6s var(--ease) both; }
+@keyframes rise {
+  from { opacity:0; transform:translateY(18px); }
+  to   { opacity:1; transform:translateY(0); }
+}
+
+/* ── card shell (wraps hub + overlays feel) ─────── */
+.card {
+  width:100%;
+  background:var(--white);
+  border-radius:28px;
+  padding:40px 32px 36px;
+  box-shadow:
+    0 0 0 1px rgba(212,105,138,.1),
+    0 20px 60px rgba(90,48,72,.1),
+    0 4px 16px rgba(90,48,72,.06);
+}
+
+/* ── greeting ───────────────────────────────────── */
+.greeting-title {
+  font-family:var(--ff-hand);
+  font-size:clamp(3.4rem,13vw,5.5rem);
+  color:var(--accent);
+  line-height:1;
+  letter-spacing:.01em;
+}
+.greeting-sub {
+  font-family:var(--ff-hand);
+  font-size:clamp(1.05rem,3.8vw,1.35rem);
+  color:var(--accent-l);
+  margin:14px 0 0;
+  max-width:420px;
+}
+.bouquet-wrap {
+  padding:36px 0 32px;
+  display:flex; justify-content:center;
+}
+.bouquet-img {
+  width:clamp(260px,72vw,380px);
+  filter:drop-shadow(0 16px 32px rgba(212,105,138,.2));
+  animation:bob 5s ease-in-out infinite;
+}
+@keyframes bob {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(-8px); }
+}
+.choice-row {
+  display:flex; align-items:center; justify-content:center;
+  gap:20px; flex-wrap:wrap;
+}
+.btn-yes {
+  font-family:var(--ff-hand); font-size:clamp(1.15rem,4vw,1.45rem);
+  letter-spacing:.02em;
+  padding:16px 48px; border-radius:999px;
+  background:linear-gradient(135deg,#E0759A,var(--accent-d));
+  color:var(--white);
+  box-shadow:0 6px 22px rgba(212,105,138,.4);
+  transition:transform .2s var(--spring),box-shadow .2s;
+}
+.btn-yes:hover  { transform:translateY(-2px) scale(1.02); box-shadow:0 10px 28px rgba(212,105,138,.5); }
+.btn-yes:active { transform:scale(.97); }
+.btn-no {
+  font-family:var(--ff-hand); font-size:clamp(1rem,3.5vw,1.2rem); color:var(--accent-l);
+  text-decoration:underline; text-decoration-style:wavy;
+  text-decoration-color:var(--accent-l); text-underline-offset:4px;
+  transition:color .2s;
+}
+.btn-no:hover { color:var(--accent); }
+
+/* ── hub (open layout, big icons like reference) ─ */
+.hub-back {
+  font-family:var(--ff-hand);
+  font-size:clamp(1rem,3.5vw,1.25rem);
+  color:var(--accent);
+  padding:20px 0 0;
+  position:relative;
+  transition:color .2s;
+}
+.hub-back::after {
+  content:'';
+  position:absolute; left:0; right:0; bottom:0; height:3px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 60 6'%3E%3Cpath d='M0 3 Q7.5 0 15 3 T30 3 T45 3 T60 3' fill='none' stroke='%23D4698A' stroke-width='1.5'/%3E%3C/svg%3E") repeat-x;
+  background-size:30px 6px;
+}
+.hub-back:hover { color:var(--accent-d); }
+
+.hub-header {
+  display:flex; align-items:center; justify-content:center;
+  gap:clamp(8px,3vw,24px);
+  width:100%;
+  margin:0 0 clamp(28px,7vw,52px);
+  padding:0 clamp(4px,2vw,16px);
+}
+.hub-bow {
+  width:clamp(52px,14vw,80px);
+  height:auto;
+  flex-shrink:0;
+  object-fit:contain;
+}
+.hub-bow--flip { transform:scaleX(-1); }
+
+.hub-title {
+  font-family:var(--ff-hand);
+  font-size:clamp(1.85rem,7vw,3.6rem);
+  color:var(--accent);
+  line-height:1.12;
+  flex:1;
+  min-width:0;
+  padding:0 4px;
+}
+
+.hub-icons {
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  justify-items:center;
+  align-items:end;
+  gap:clamp(12px,5vw,48px);
+  width:100%;
+  max-width:560px;
+  margin:0 auto clamp(24px,5vw,44px);
+}
+.hub-icon {
+  display:flex; flex-direction:column; align-items:center;
+  padding:6px;
+  background:none; border:none;
+  color:var(--accent);
+  position:relative;
+  transition:transform .25s var(--spring);
+  width:100%;
+  max-width:120px;
+}
+.hub-icon:hover { transform:translateY(-8px) scale(1.06); }
+.hub-icon:active { transform:scale(.95); }
+.hub-icon svg {
+  width:100%;
+  max-width:clamp(56px,22vw,96px);
+  height:auto;
+}
+.hub-icon__label { display:none; }
+.hub-icon__dot {
+  position:absolute; top:0; right:0;
+  width:10px; height:10px; border-radius:50%;
+  border:2px solid var(--accent-l);
+  transition:background .3s,box-shadow .3s,border-color .3s;
+}
+.hub-icon__dot.lit {
+  background:var(--accent); border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(212,105,138,.25);
+}
+
+.hub-footer {
+  display:flex; flex-direction:column; align-items:center;
+  gap:24px; width:100%;
+}
+
+.btn-finish {
+  width:auto; min-width:min(100%,320px);
+  font-family:var(--ff-hand);
+  font-size:clamp(1rem,3.5vw,1.2rem);
+  padding:16px 40px; border-radius:999px;
+  border:2px dashed var(--accent-l);
+  color:var(--accent-l);
+  transition:all .25s var(--ease);
+}
+.btn-finish:not(:disabled) {
+  border-style:solid; border-color:transparent;
+  background:linear-gradient(135deg,#E0759A,var(--accent-d));
+  color:var(--white);
+  box-shadow:0 6px 20px rgba(212,105,138,.38);
+}
+.btn-finish:not(:disabled):hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(212,105,138,.48); }
+.btn-finish:disabled { cursor:not-allowed; }
+
+/* ── finale ─────────────────────────────────────── */
+.finale-bow { width:clamp(60px,16vw,88px); margin:0 auto 12px; }
+.finale-bouquet {
+  width:clamp(110px,30vw,160px);
+  margin:0 auto 22px;
+  filter:drop-shadow(0 10px 20px rgba(212,105,138,.16));
+  animation:bob 5s ease-in-out infinite;
+}
+.finale-lines { display:flex; flex-direction:column; gap:8px; }
+.finale-lines p {
+  font-family:var(--ff-display); font-style:italic;
+  font-size:clamp(1.15rem,3.8vw,1.5rem);
+  line-height:1.55; color:var(--ink);
+}
+.finale-signoff {
+  font-size:clamp(1.35rem,4.5vw,1.8rem) !important;
+  color:var(--accent) !important; margin-top:4px;
+}
+.btn-replay {
+  margin-top:24px;
+  font-family:var(--ff-ui); font-size:.85rem; font-weight:600;
+  letter-spacing:.05em;
+  padding:11px 26px; border-radius:999px;
+  border:1.5px solid var(--accent-l); color:var(--accent);
+  transition:background .2s,border-color .2s;
+}
+.btn-replay:hover { background:var(--blush); border-color:var(--accent); }
+
+/* ── overlay backdrop ───────────────────────────── */
+.overlay-backdrop {
+  position:fixed; inset:0;
+  background:rgba(90,48,72,.25);
+  backdrop-filter:blur(10px);
+  -webkit-backdrop-filter:blur(10px);
+  opacity:0; pointer-events:none;
+  transition:opacity .28s; z-index:40;
+}
+.overlay-backdrop.active { opacity:1; pointer-events:auto; }
+
+/* ── overlay panel ──────────────────────────────── */
+.overlay {
+  position:fixed; left:50%; top:50%;
+  transform:translate(-50%,-44%) scale(.95);
+  width:min(580px,94vw); max-height:88vh;
+  overflow-y:auto;
+  background:var(--white);
+  border-radius:28px;
+  padding:30px 22px 28px;
+  opacity:0; pointer-events:none; text-align:center;
+  transition:opacity .28s,transform .32s var(--ease);
+  z-index:50;
+  box-shadow:0 0 0 1px rgba(212,105,138,.1),0 28px 70px rgba(90,48,72,.22);
+  scrollbar-width:thin; scrollbar-color:var(--accent-l) transparent;
+}
+.overlay.active { opacity:1; pointer-events:auto; transform:translate(-50%,-50%) scale(1); }
+
+.overlay__close {
+  position:absolute; top:12px; right:12px;
+  width:32px; height:32px; border-radius:50%;
+  background:var(--blush); color:var(--accent);
+  font-size:.8rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s,transform .2s;
+}
+.overlay__close:hover { background:var(--petal); transform:rotate(90deg); }
+
+.overlay__bow {
+  width:clamp(64px,16vw,90px);
+  height:clamp(50px,12vw,70px);
+  margin:0 auto 6px;
+  overflow:hidden;
+  display:flex; align-items:flex-start; justify-content:center;
+}
+.overlay__bow .bow-img { width:100%; height:auto; }
+.overlay__eyebrow {
+  font-family:var(--ff-ui); font-size:.68rem; font-weight:700;
+  letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent-l); margin-bottom:2px;
+}
+.overlay__title {
+  font-family:var(--ff-hand);
+  font-size:clamp(1.6rem,5.5vw,2.2rem);
+  color:var(--accent); margin-bottom:4px;
+}
+.overlay__hint {
+  font-family:var(--ff-hand); font-size:.88rem;
+  color:var(--accent-l); margin-bottom:20px;
+}
+
+/* ── polaroids ──────────────────────────────────── */
+.photos-polaroids {
+  display:grid; grid-template-columns:repeat(2,1fr); gap:12px;
+}
+@media(min-width:400px){ .photos-polaroids{ grid-template-columns:repeat(4,1fr); gap:10px; } }
+
+.polaroid {
+  background:var(--white);
+  padding:6px 6px 22px;
+  box-shadow:0 4px 16px rgba(90,48,72,.12);
+  transform:rotate(var(--tilt,0deg));
+  transition:transform .25s var(--spring),box-shadow .25s;
+  border-radius:2px;
+}
+.polaroid:hover { transform:rotate(0) scale(1.06) translateY(-3px); box-shadow:0 12px 32px rgba(90,48,72,.2); z-index:2; position:relative; }
+.polaroid:nth-child(1){--tilt:-4deg;} .polaroid:nth-child(2){--tilt:3deg;}
+.polaroid:nth-child(3){--tilt:-2.5deg;} .polaroid:nth-child(4){--tilt:2deg;}
+
+.polaroid__photo {
+  width:100%; aspect-ratio:1;
+  background:var(--blush);
+  border:1.5px dashed var(--accent-l);
+  display:flex; align-items:center; justify-content:center;
+  overflow:hidden; cursor:pointer;
+  transition:background .2s;
+}
+.polaroid__photo:hover { background:var(--petal); }
+.polaroid__photo img { width:100%; height:100%; object-fit:cover; display:none; }
+.polaroid.has-photo .polaroid__photo img { display:block; }
+.polaroid.has-photo .polaroid__hint { display:none; }
+.polaroid__hint { font-size:.65rem; color:var(--accent-l); text-align:center; padding:4px; }
+.polaroid figcaption { font-size:.78rem; color:var(--accent); margin-top:6px; text-align:center; }
+
+/* ── letters overlay ────────────────────────────── */
+.overlay--letters {
+  background:linear-gradient(150deg,#9A3E58 0%,#C47090 50%,#A090C8 100%);
+  color:var(--white);
+}
+.overlay--letters .overlay__close { background:rgba(255,255,255,.18); color:var(--white); }
+.overlay--letters .overlay__close:hover { background:rgba(255,255,255,.28); }
+.overlay--letters .overlay__title { color:var(--white); }
+.overlay--letters .overlay__eyebrow { color:rgba(255,255,255,.6); }
+.overlay--letters .overlay__hint { color:rgba(255,255,255,.7); }
+.overlay--letters .polaroid figcaption { color:var(--ink); }
+
+.envelope-row {
+  display:flex; justify-content:center;
+  gap:clamp(12px,4vw,24px); margin:6px 0 22px; flex-wrap:wrap;
+}
+.envelope-btn { padding:4px; transition:transform .28s var(--spring); }
+.envelope-btn:hover  { transform:translateY(-8px) rotate(-2deg); }
+.envelope-btn.active { transform:translateY(-12px) scale(1.05); }
+.envelope-btn.active .envelope__flap { transform:rotateX(185deg); }
+
+.envelope {
+  width:clamp(76px,19vw,96px); height:clamp(56px,13vw,70px);
+  position:relative; perspective:300px;
+}
+.envelope__body {
+  position:absolute; inset:0;
+  background:var(--white); border-radius:5px;
+  box-shadow:0 6px 20px rgba(0,0,0,.18);
+}
+.envelope__flap {
+  position:absolute; top:0; left:0; right:0; height:52%;
+  background:#F5C6D8;
+  clip-path:polygon(0 0,50% 100%,100% 0);
+  transform-origin:top center;
+  transition:transform .45s var(--ease);
+}
+.envelope__bow-svg {
+  position:absolute; top:-14px; left:50%; transform:translateX(-50%);
+  width:28px; height:20px; color:var(--accent);
+  z-index:2; filter:drop-shadow(0 1px 2px rgba(0,0,0,.1));
+}
+.envelope__label {
+  position:absolute; bottom:6px; left:0; right:0;
+  font-size:.72rem; color:var(--accent-d); text-align:center;
+}
+
+.letter-reveal { display:none; flex-direction:column; align-items:center; }
+.letter-reveal.active { display:flex; animation:rise .45s var(--ease) both; }
+
+.scalloped-card {
+  position:relative; background:var(--white); color:var(--ink);
+  padding:32px 24px 26px; max-width:380px; width:100%;
+  margin:0 auto 18px; text-align:left;
+  border-radius:16px;
+  box-shadow:0 16px 50px rgba(0,0,0,.2);
+}
+.scalloped-card__bow-wrap {
+  width:80px; height:56px;
+  margin:-44px auto 6px;
+  overflow:hidden;
+  display:flex; align-items:flex-start; justify-content:center;
+}
+.scalloped-card__bow-wrap .bow-img { width:100%; height:auto; }
+.scalloped-card__to {
+  font-family:var(--ff-ui); font-size:.72rem; font-weight:700;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:12px;
+}
+.scalloped-card__body {
+  font-family:var(--ff-display); font-size:clamp(.95rem,3vw,1.1rem);
+  line-height:1.7; margin-bottom:14px;
+}
+.scalloped-card__sign {
+  font-family:var(--ff-ui); font-size:.72rem; font-weight:700;
+  letter-spacing:.08em; text-transform:uppercase;
+  color:var(--accent); text-align:right;
+}
+
+.polaroid-strip { display:none; justify-content:center; gap:10px; flex-wrap:wrap; width:100%; }
+.polaroid-strip.active { display:flex; animation:rise .4s .1s var(--ease) both; }
+.polaroid-strip .polaroid { width:clamp(78px,20vw,96px); }
+
+/* ── songs ──────────────────────────────────────── */
+.tracks { display:flex; flex-direction:column; gap:8px; text-align:left; }
+.track {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; border-radius:14px;
+  background:var(--cream); border:1px solid rgba(212,105,138,.12);
+  transition:background .2s,transform .2s;
+}
+.track:hover { background:var(--blush); transform:translateX(3px); }
+.track__vinyl {
+  width:42px; height:42px; flex:none;
+  background:linear-gradient(135deg,#E0759A,var(--accent-d));
+  border-radius:50%; color:var(--white);
+  display:flex; align-items:center; justify-content:center;
+  box-shadow:0 3px 10px rgba(212,105,138,.3);
+  transition:transform .2s var(--spring);
+}
+.track__vinyl:hover { transform:scale(1.08); }
+.track__vinyl svg { width:22px; height:22px; }
+.track.playing .track__vinyl { animation:spin 2.2s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg);} }
+.track__title { font-size:.95rem; color:var(--ink); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.track__note  { font-family:var(--ff-ui); font-size:.75rem; color:var(--accent-l); margin-top:1px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+#nowPlaying { min-height:1.2em; margin-top:12px; }
+
+/* ── gift ───────────────────────────────────────── */
+.gift-sketch {
+  width:130px; height:120px; margin:6px auto 20px;
+  cursor:pointer; color:var(--accent);
+  transition:transform .3s var(--spring);
+}
+.gift-sketch:hover { transform:scale(1.06) rotate(-2deg); }
+.gift-sketch.opened { animation:giftPop .5s var(--spring); }
+@keyframes giftPop { 50%{transform:scale(1.12) rotate(-4deg);} }
+.gift-message {
+  font-family:var(--ff-display); font-style:italic;
+  font-size:clamp(1rem,3.2vw,1.2rem); line-height:1.6;
+  color:var(--accent-d); padding:18px 20px;
+  background:var(--blush); border-radius:16px;
+  border:1px solid rgba(212,105,138,.14);
+}
+
+/* ── responsive ─────────────────────────────────── */
+/* phone: diamond icon layout, scaled-up type & icons */
+@media(max-width:480px){
+  #app {
+    padding:max(28px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
+    min-height:100dvh;
+  }
+  .screen--hub { max-width:100%; }
+  .hub-header { gap:clamp(6px,2.5vw,14px); margin-bottom:clamp(28px,8vw,40px); }
+  .hub-bow { width:clamp(44px,12vw,60px); }
+  .hub-title { font-size:clamp(1.75rem,8.5vw,2.35rem); }
+  .hub-icons {
+    grid-template-columns:repeat(3,1fr);
+    gap:clamp(20px,6vw,32px) clamp(12px,4vw,20px);
+    max-width:min(100%,340px);
+    padding:0 8px;
+  }
+  .hub-icon[data-target="gift"] { grid-column:2; grid-row:2; }
+  .hub-icon svg { max-width:clamp(52px,20vw,80px); }
+  .hub-footer { gap:22px; }
+  .btn-finish { min-width:100%; padding:15px 24px; font-size:1.05rem; }
+  .corner-border { width:clamp(80px,20vw,130px); opacity:.35; }
+  .overlay { padding:24px 16px 22px; }
+  .photos-polaroids { grid-template-columns:repeat(2,1fr); }
+}
+
+/* very small phones */
+@media(max-width:360px){
+  .card { padding:28px 20px 24px; }
+  .hub-icon svg { max-width:48px; }
+  .hub-bow { width:40px; }
+  .hub-title { font-size:1.55rem; }
+  .greeting-title { font-size:2.8rem; }
+  .bouquet-img { width:min(72vw,260px); }
+}
+
+/* tablet / desktop: 4-across like web reference */
+@media(min-width:600px){
+  .hub-icons { max-width:620px; gap:40px 56px; }
+  .hub-icon svg { max-width:96px; }
+  .hub-bow { width:80px; }
+  .corner-border { width:clamp(90px,22vw,180px); opacity:.38; }
+}
+@media(prefers-reduced-motion:reduce){
+  .petals { display:none; }
+  *,*::before,*::after { animation-duration:.01ms!important; transition-duration:.01ms!important; }
+}
+</style>
+</head>
+<body>
+
+<div class="petals" id="petals" aria-hidden="true"></div>
+
+<div class="corner-borders" aria-hidden="true">
+  <img class="corner-border corner-border--tl" src="assets/ribbon-corner.png" alt="" />
+  <img class="corner-border corner-border--tr" src="assets/ribbon-corner.png" alt="" />
+  <img class="corner-border corner-border--bl" src="assets/ribbon-corner.png" alt="" />
+  <img class="corner-border corner-border--br" src="assets/ribbon-corner.png" alt="" />
+</div>
+
+<svg style="display:none" aria-hidden="true">
+  <symbol id="icon-camera" viewBox="0 0 64 56">
+    <rect x="8" y="18" width="48" height="32" rx="5" fill="none" stroke="currentColor" stroke-width="2"/>
+    <rect x="22" y="10" width="20" height="10" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="32" cy="34" r="9" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="32" cy="34" r="4.5" fill="currentColor" opacity=".35"/>
+  </symbol>
+  <symbol id="icon-headphones" viewBox="0 0 64 56">
+    <path d="M14 34 C14 16 24 7 32 7 C40 7 50 16 50 34" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/>
+    <rect x="7" y="32" width="13" height="17" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
+    <rect x="44" y="32" width="13" height="17" rx="6" fill="none" stroke="currentColor" stroke-width="2"/>
+  </symbol>
+  <symbol id="icon-envelope" viewBox="0 0 64 48">
+    <rect x="6" y="9" width="52" height="34" rx="4" fill="none" stroke="currentColor" stroke-width="2"/>
+    <path d="M6 13 L32 29 L58 13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="icon-gift" viewBox="0 0 64 64">
+    <rect x="10" y="27" width="44" height="29" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+    <rect x="8" y="17" width="48" height="12" rx="3" fill="none" stroke="currentColor" stroke-width="2"/>
+    <line x1="32" y1="17" x2="32" y2="56" stroke="currentColor" stroke-width="2"/>
+    <path d="M32 17 C26 9 13 9 13 17 C13 24 22 23 32 17Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+    <path d="M32 17 C38 9 51 9 51 17 C51 24 42 23 32 17Z" fill="none" stroke="currentColor" stroke-width="1.8"/>
+  </symbol>
+  <symbol id="icon-bow-mini" viewBox="0 0 40 28">
+    <path d="M20 14 C14 6 4 6 6 14 C8 20 14 18 20 14Z" fill="currentColor" opacity=".9"/>
+    <path d="M20 14 C26 6 36 6 34 14 C32 20 26 18 20 14Z" fill="currentColor" opacity=".9"/>
+    <circle cx="20" cy="14" r="3" fill="currentColor"/>
+    <path d="M12 16 Q10 22 8 26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+    <path d="M28 16 Q30 22 32 26" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+  </symbol>
+  <symbol id="icon-vinyl" viewBox="0 0 48 48">
+    <circle cx="24" cy="24" r="18" fill="none" stroke="currentColor" stroke-width="2"/>
+    <circle cx="24" cy="24" r="10" fill="none" stroke="currentColor" stroke-width="1.5" opacity=".5"/>
+    <circle cx="24" cy="24" r="3.5" fill="currentColor"/>
+  </symbol>
+</svg>
+
+<main id="app">
+
+  <!-- GREETING -->
+  <section class="screen active" id="screen-greeting" aria-label="Greeting">
+    <h1 class="greeting-title" contenteditable="true" spellcheck="false">hi, love!</h1>
+    <p class="greeting-sub" contenteditable="true">do you want to see a little surprise for you?</p>
+    <div class="bouquet-wrap">
+      <img class="bouquet-img" src="assets/bouquet.png" alt="A watercolor bouquet of peonies and tulips" />
+    </div>
+    <div class="choice-row">
+      <button class="btn-yes" id="yesBtn" type="button">yes!!</button>
+      <button class="btn-no"  id="noBtn"  type="button">no, thanks.</button>
+    </div>
+  </section>
+
+  <!-- HUB -->
+  <section class="screen screen--hub" id="screen-hub" aria-label="Surprises">
+
+    <div class="hub-header">
+      <img class="bow-img hub-bow" src="assets/bows/bow-3.png" alt="" aria-hidden="true" />
+      <h2 class="hub-title">these are for you</h2>
+      <img class="bow-img hub-bow hub-bow--flip" src="assets/bows/bow-3.png" alt="" aria-hidden="true" />
+    </div>
+
+    <div class="hub-icons">
+      <button class="hub-icon" data-target="photos" type="button" aria-label="Photo memories">
+        <span class="hub-icon__dot" data-dot="photos"></span>
+        <svg viewBox="0 0 64 56"><use href="#icon-camera"></use></svg>
+      </button>
+      <button class="hub-icon" data-target="songs" type="button" aria-label="Songs">
+        <span class="hub-icon__dot" data-dot="songs"></span>
+        <svg viewBox="0 0 64 56"><use href="#icon-headphones"></use></svg>
+      </button>
+      <button class="hub-icon" data-target="letters" type="button" aria-label="Letters">
+        <span class="hub-icon__dot" data-dot="letters"></span>
+        <svg viewBox="0 0 64 48"><use href="#icon-envelope"></use></svg>
+      </button>
+      <button class="hub-icon" data-target="gift" type="button" aria-label="Gift">
+        <span class="hub-icon__dot" data-dot="gift"></span>
+        <svg viewBox="0 0 64 64"><use href="#icon-gift"></use></svg>
+      </button>
+    </div>
+
+    <div class="hub-footer">
+      <button class="hub-back" id="backBtn" type="button">home</button>
+      <button class="btn-finish" id="finishBtn" type="button" disabled>open them all first</button>
+    </div>
+  </section>
+
+  <!-- FINALE -->
+  <section class="screen" id="screen-finale" aria-label="Happy birthday">
+    <div class="card">
+      <img class="bow-img finale-bow" src="assets/bows/bow-1.png" alt="" aria-hidden="true" />
+      <img class="finale-bouquet" src="assets/bouquet.png" alt="" aria-hidden="true" />
+      <div class="finale-lines">
+        <p contenteditable="true">thank you for another year of being exactly you.</p>
+        <p contenteditable="true">however today goes, I hope it feels this warm.</p>
+        <p class="finale-signoff" contenteditable="true">happy birthday, <span id="finaleName">love</span> 💐</p>
+      </div>
+      <button class="btn-replay" id="replayBtn" type="button">open it again ♡</button>
+    </div>
+  </section>
+
+</main>
+
+<!-- OVERLAYS -->
+<div class="overlay-backdrop" id="overlayBackdrop"></div>
+
+<section class="overlay" id="overlay-photos" aria-label="Photo memories">
+  <button class="overlay__close" data-close type="button" aria-label="Close">✕</button>
+  <div class="overlay__bow" aria-hidden="true">
+    <img class="bow-img" src="assets/bows/bow-4.png" alt="" />
+  </div>
+  <p class="overlay__eyebrow">little moments</p>
+  <h3 class="overlay__title">captured for you</h3>
+  <p class="overlay__hint">tap a polaroid to add your photo</p>
+  <div class="photos-polaroids">
+    <figure class="polaroid">
+      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
+        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+        <span class="polaroid__hint">+ add photo</span>
+      </div>
+      <figcaption contenteditable="true">that day downtown</figcaption>
+    </figure>
+    <figure class="polaroid">
+      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
+        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+        <span class="polaroid__hint">+ add photo</span>
+      </div>
+      <figcaption contenteditable="true">the road trip</figcaption>
+    </figure>
+    <figure class="polaroid">
+      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
+        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+        <span class="polaroid__hint">+ add photo</span>
+      </div>
+      <figcaption contenteditable="true">your best look</figcaption>
+    </figure>
+    <figure class="polaroid">
+      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
+        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+        <span class="polaroid__hint">+ add photo</span>
+      </div>
+      <figcaption contenteditable="true">last birthday</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="overlay overlay--letters" id="overlay-letters" aria-label="Letters">
+  <button class="overlay__close" data-close type="button" aria-label="Close">✕</button>
+  <p class="overlay__eyebrow">written with love</p>
+  <h3 class="overlay__title">pick an envelope</h3>
+  <p class="overlay__hint">tap one to read what's inside</p>
+
+  <div class="envelope-row">
+    <button class="envelope-btn" data-letter="0" type="button" aria-label="Letter from mom">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">mom</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="1" type="button" aria-label="Letter from bestie">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">bestie</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="2" type="button" aria-label="Letter from family">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">family</span>
+      </div>
+    </button>
+  </div>
+
+  <div class="letter-reveal" id="letterReveal">
+    <div class="scalloped-card">
+      <div class="scalloped-card__bow-wrap" aria-hidden="true">
+        <img class="bow-img" src="assets/bows/bow-5.png" alt="" />
+      </div>
+      <p class="scalloped-card__to"   id="letterTo"   contenteditable="true">my love,</p>
+      <p class="scalloped-card__body" id="letterBody" contenteditable="true">Happy birthday! You make every day brighter, every laugh louder, and my heart fuller. Here's to you — my joy, my favorite person, my everything.</p>
+      <p class="scalloped-card__sign" contenteditable="true">forever yours,<br><span id="letterFrom">y/n</span></p>
+    </div>
+  </div>
+
+  <div class="polaroid-strip" id="letterPolaroids">
+    <figure class="polaroid">
+      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
+        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+        <span class="polaroid__hint">+ photo</span>
+      </div>
+      <figcaption contenteditable="true">us, always</figcaption>
+    </figure>
+    <figure class="polaroid">
+      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
+        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+        <span class="polaroid__hint">+ photo</span>
+      </div>
+      <figcaption contenteditable="true">my fav smile</figcaption>
+    </figure>
+    <figure class="polaroid">
+      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
+        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+        <span class="polaroid__hint">+ photo</span>
+      </div>
+      <figcaption contenteditable="true">this one too</figcaption>
+    </figure>
+  </div>
+</section>
+
+<section class="overlay" id="overlay-songs" aria-label="Songs">
+  <button class="overlay__close" data-close type="button" aria-label="Close">✕</button>
+  <p class="overlay__eyebrow">the soundtrack</p>
+  <h3 class="overlay__title">songs for you</h3>
+  <p class="overlay__hint">tap the record to spin it</p>
+  <div class="tracks">
+    <div class="track">
+      <button class="track__vinyl" type="button" aria-label="Play song">
+        <svg viewBox="0 0 48 48"><use href="#icon-vinyl"></use></svg>
+      </button>
+      <div>
+        <div class="track__title" contenteditable="true">song title — artist</div>
+        <div class="track__note"  contenteditable="true">this one's for the long drives</div>
+      </div>
+    </div>
+    <div class="track">
+      <button class="track__vinyl" type="button" aria-label="Play song">
+        <svg viewBox="0 0 48 48"><use href="#icon-vinyl"></use></svg>
+      </button>
+      <div>
+        <div class="track__title" contenteditable="true">song title — artist</div>
+        <div class="track__note"  contenteditable="true">we played this way too loud</div>
+      </div>
+    </div>
+    <div class="track">
+      <button class="track__vinyl" type="button" aria-label="Play song">
+        <svg viewBox="0 0 48 48"><use href="#icon-vinyl"></use></svg>
+      </button>
+      <div>
+        <div class="track__title" contenteditable="true">song title — artist</div>
+        <div class="track__note"  contenteditable="true">the one that made you cry</div>
+      </div>
+    </div>
+  </div>
+  <p class="overlay__hint" id="nowPlaying"></p>
+</section>
+
+<section class="overlay" id="overlay-gift" aria-label="Gift">
+  <button class="overlay__close" data-close type="button" aria-label="Close">✕</button>
+  <p class="overlay__eyebrow">one more thing</p>
+  <h3 class="overlay__title">just for you</h3>
+  <p class="overlay__hint">tap the gift to unwrap it</p>
+  <div class="gift-sketch" id="giftBox" role="button" tabindex="0" aria-label="Unwrap gift">
+    <svg viewBox="0 0 64 64" width="100%" height="100%"><use href="#icon-gift"></use></svg>
+  </div>
+  <div class="gift-message" contenteditable="true">Consider this an IOU — redeem for one real gift, chosen just with you in mind.</div>
+</section>
+
+<script>
+(function(){
+  const state = { visited:{ photos:false, letters:false, songs:false, gift:false } };
+  const letters = [
+    { to:'my love,', body:'Happy birthday! You make every day brighter, every laugh louder, and my heart fuller. Here\'s to you — my joy, my favorite person, my everything.', from:'mom' },
+    { to:'hey you,', body:'I don\'t say it enough, but I\'m really glad you exist. Thanks for every late-night talk, every dumb joke, and every time you showed up for me. Love you lots.', from:'your best friend' },
+    { to:'to our favorite person,', body:'We are so proud of the person you\'ve become. May this year bring you everything your heart has been quietly wishing for. We love you more than words can say.', from:'the whole family' }
+  ];
+
+  function goTo(id){
+    document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+  }
+  function updateProgress(){
+    Object.keys(state.visited).forEach(k=>{
+      const dot=document.querySelector('.hub-icon__dot[data-dot="'+k+'"]');
+      if(dot) dot.classList.toggle('lit',state.visited[k]);
+    });
+    const all=Object.values(state.visited).every(Boolean);
+    const btn=document.getElementById('finishBtn');
+    btn.disabled=!all;
+    btn.textContent=all?'see the last note ✦':'open them all first';
+  }
+  function openOverlay(key){
+    document.getElementById('overlayBackdrop').classList.add('active');
+    document.getElementById('overlay-'+key).classList.add('active');
+    state.visited[key]=true; updateProgress();
+  }
+  function closeOverlay(){
+    document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('active'));
+    document.getElementById('overlayBackdrop').classList.remove('active');
+    resetLetterView();
+  }
+  function resetLetterView(){
+    document.querySelectorAll('.envelope-btn').forEach(b=>b.classList.remove('active'));
+    document.getElementById('letterReveal').classList.remove('active');
+    document.getElementById('letterPolaroids').classList.remove('active');
+  }
+
+  document.querySelectorAll('.hub-icon').forEach(i=>i.addEventListener('click',()=>openOverlay(i.dataset.target)));
+  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeOverlay));
+  document.getElementById('overlayBackdrop').addEventListener('click',closeOverlay);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
+
+  document.getElementById('yesBtn').addEventListener('click',()=>goTo('screen-hub'));
+  document.getElementById('noBtn').addEventListener('click', ()=>goTo('screen-hub'));
+  document.getElementById('backBtn').addEventListener('click',()=>goTo('screen-greeting'));
+  document.getElementById('finishBtn').addEventListener('click',function(){if(!this.disabled)goTo('screen-finale');});
+  document.getElementById('replayBtn').addEventListener('click',()=>{
+    state.visited={photos:false,letters:false,songs:false,gift:false};
+    updateProgress(); resetLetterView(); goTo('screen-greeting');
+  });
+
+  document.querySelectorAll('.envelope-btn').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const l=letters[parseInt(btn.dataset.letter,10)];
+      document.querySelectorAll('.envelope-btn').forEach(b=>b.classList.remove('active'));
+      btn.classList.add('active');
+      document.getElementById('letterTo').textContent=l.to;
+      document.getElementById('letterBody').textContent=l.body;
+      document.getElementById('letterFrom').textContent=l.from;
+      document.getElementById('letterReveal').classList.add('active');
+      document.getElementById('letterPolaroids').classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.polaroid__photo').forEach(frame=>{
+    const input=frame.querySelector('input[type=file]'), img=frame.querySelector('img');
+    frame.addEventListener('click',()=>input.click());
+    frame.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
+    input.addEventListener('change',()=>{
+      const f=input.files[0]; if(!f)return;
+      const r=new FileReader();
+      r.onload=()=>{img.src=r.result;frame.closest('.polaroid').classList.add('has-photo');};
+      r.readAsDataURL(f);
+    });
+  });
+
+  document.querySelectorAll('.track__vinyl').forEach(btn=>{
+    btn.addEventListener('click',()=>{
+      const t=btn.closest('.track');
+      document.querySelectorAll('.track').forEach(x=>x.classList.remove('playing'));
+      t.classList.add('playing');
+      document.getElementById('nowPlaying').textContent='now spinning: '+t.querySelector('.track__title').textContent.trim();
+    });
+  });
+
+  const gift=document.getElementById('giftBox');
+  function unwrap(){gift.classList.toggle('opened');}
+  gift.addEventListener('click',unwrap);
+  gift.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();unwrap();}});
+
+  (function spawnPetals(){
+    if(window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const wrap=document.getElementById('petals');
+    const hues=['#F9DAE7','#EFC0D0','#FCEAF2','#E8B4C8','#D4698A','#C3B8E8'];
+    const n=window.innerWidth<480?10:16;
+    for(let i=0;i<n;i++){
+      const p=document.createElement('span');
+      p.className='petal';
+      const w=7+Math.random()*9;
+      const h=w*(0.55+Math.random()*0.45);
+      const o=(0.18+Math.random()*0.22).toFixed(2);
+      p.style.cssText=
+        'left:'+(Math.random()*100)+'%;'+
+        'width:'+w.toFixed(1)+'px;'+
+        'height:'+h.toFixed(1)+'px;'+
+        'background:'+hues[i%hues.length]+';'+
+        '--o:'+o+';'+
+        '--sway:'+((Math.random()-.5)*70).toFixed(0)+'px;'+
+        '--spin:'+(Math.random()*360).toFixed(0)+'deg;'+
+        'animation-duration:'+(16+Math.random()*14).toFixed(1)+'s;'+
+        'animation-delay:'+(-Math.random()*24).toFixed(1)+'s;';
+      wrap.appendChild(p);
+    }
+  })();
+
+  updateProgress();
+})();
+</script>
+</body>
+</html>
