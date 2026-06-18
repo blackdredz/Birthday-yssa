@@ -102,9 +102,6 @@ body {
 
 button { font-family:inherit; cursor:pointer; border:none; background:none; }
 img    { display:block; max-width:100%; }
-[contenteditable="true"] { cursor:text; border-radius:4px; padding:1px 3px; outline:none; transition:background .2s; }
-[contenteditable="true"]:hover,
-[contenteditable="true"]:focus { background:rgba(212,105,138,.09); }
 .visually-hidden { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 
 /* ── bow images ─────────────────────────────────── */
@@ -265,14 +262,17 @@ img    { display:block; max-width:100%; }
   position:relative;
   transition:transform .25s var(--spring);
   width:100%;
-  max-width:120px;
+  max-width:140px;
 }
 .hub-icon:hover { transform:translateY(-8px) scale(1.06); }
 .hub-icon:active { transform:scale(.95); }
-.hub-icon svg {
+.hub-icon__art {
   width:100%;
-  max-width:clamp(56px,22vw,96px);
+  max-width:clamp(64px,24vw,110px);
   height:auto;
+  object-fit:contain;
+  pointer-events:none;
+  user-select:none;
 }
 .hub-icon__label { display:none; }
 .hub-icon__dot {
@@ -426,10 +426,49 @@ img    { display:block; max-width:100%; }
 }
 .polaroid__photo:hover { background:var(--petal); }
 .polaroid__photo img { width:100%; height:100%; object-fit:cover; display:none; }
-.polaroid.has-photo .polaroid__photo img { display:block; }
+.polaroid.has-photo .polaroid__photo img { display:block; cursor:zoom-in; }
 .polaroid.has-photo .polaroid__hint { display:none; }
 .polaroid__hint { font-size:.65rem; color:var(--accent-l); text-align:center; padding:4px; }
 .polaroid figcaption { font-size:.78rem; color:var(--accent); margin-top:6px; text-align:center; }
+
+/* ── photo lightbox ─────────────────────────────── */
+.photo-lightbox {
+  position:fixed; inset:0; z-index:100;
+  display:flex; flex-direction:column; align-items:center; justify-content:center;
+  padding:max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+  background:rgba(45,24,36,.94);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  opacity:0; pointer-events:none;
+  transition:opacity .25s;
+}
+.photo-lightbox.active { opacity:1; pointer-events:auto; }
+.photo-lightbox__close {
+  position:absolute; top:max(14px, env(safe-area-inset-top)); right:14px;
+  width:40px; height:40px; border-radius:50%;
+  background:rgba(255,255,255,.16); color:var(--white);
+  font-size:.95rem; font-weight:700;
+  display:flex; align-items:center; justify-content:center;
+  transition:background .2s,transform .2s;
+}
+.photo-lightbox__close:hover { background:rgba(255,255,255,.28); transform:rotate(90deg); }
+.photo-lightbox__img {
+  max-width:min(92vw,720px); max-height:min(72vh,720px);
+  width:auto; height:auto; object-fit:contain;
+  border-radius:10px;
+  box-shadow:0 24px 70px rgba(0,0,0,.45);
+  animation:lightboxIn .32s var(--ease) both;
+}
+.photo-lightbox__caption {
+  margin-top:14px; max-width:min(92vw,520px);
+  font-family:var(--ff-hand); font-size:1rem;
+  color:rgba(255,255,255,.88); text-align:center;
+}
+.photo-lightbox__caption[hidden] { display:none; }
+@keyframes lightboxIn {
+  from { opacity:0; transform:scale(.94); }
+  to   { opacity:1; transform:scale(1); }
+}
 
 /* ── letters overlay ────────────────────────────── */
 .overlay--letters {
@@ -445,7 +484,8 @@ img    { display:block; max-width:100%; }
 
 .envelope-row {
   display:flex; justify-content:center;
-  gap:clamp(12px,4vw,24px); margin:6px 0 22px; flex-wrap:wrap;
+  gap:clamp(8px,3vw,16px); margin:6px 0 22px; flex-wrap:wrap;
+  max-width:520px; margin-left:auto; margin-right:auto;
 }
 .envelope-btn { padding:4px; transition:transform .28s var(--spring); }
 .envelope-btn:hover  { transform:translateY(-8px) rotate(-2deg); }
@@ -453,7 +493,7 @@ img    { display:block; max-width:100%; }
 .envelope-btn.active .envelope__flap { transform:rotateX(185deg); }
 
 .envelope {
-  width:clamp(76px,19vw,96px); height:clamp(56px,13vw,70px);
+  width:clamp(68px,16vw,88px); height:clamp(50px,12vw,64px);
   position:relative; perspective:300px;
 }
 .envelope__body {
@@ -474,8 +514,10 @@ img    { display:block; max-width:100%; }
   z-index:2; filter:drop-shadow(0 1px 2px rgba(0,0,0,.1));
 }
 .envelope__label {
-  position:absolute; bottom:6px; left:0; right:0;
-  font-size:.72rem; color:var(--accent-d); text-align:center;
+  position:absolute; bottom:4px; left:0; right:0;
+  font-size:clamp(.55rem,2vw,.68rem); line-height:1.05;
+  color:var(--accent-d); text-align:center;
+  padding:0 3px;
 }
 
 .letter-reveal { display:none; flex-direction:column; align-items:center; }
@@ -503,6 +545,7 @@ img    { display:block; max-width:100%; }
 .scalloped-card__body {
   font-family:var(--ff-display); font-size:clamp(.95rem,3vw,1.1rem);
   line-height:1.7; margin-bottom:14px;
+  white-space:pre-line;
 }
 .scalloped-card__sign {
   font-family:var(--ff-ui); font-size:.72rem; font-weight:700;
@@ -569,11 +612,12 @@ img    { display:block; max-width:100%; }
   .hub-title { font-size:clamp(1.75rem,8.5vw,2.35rem); }
   .hub-icons {
     grid-template-columns:repeat(2,1fr);
-    gap:clamp(24px,7vw,36px) clamp(16px,5vw,28px);
-    max-width:min(100%,320px);
-    padding:0 8px;
+    gap:clamp(20px,6vw,32px) clamp(12px,4vw,24px);
+    max-width:min(100%,400px);
+    padding:0 4px;
   }
-  .hub-icon svg { max-width:clamp(52px,20vw,80px); }
+  .hub-icon { max-width:170px; }
+  .hub-icon__art { max-width:clamp(88px,34vw,132px); }
   .hub-footer { gap:22px; }
   .btn-finish { min-width:100%; padding:15px 24px; font-size:1.05rem; }
   .corner-border { width:clamp(80px,20vw,130px); opacity:.35; }
@@ -584,7 +628,8 @@ img    { display:block; max-width:100%; }
 /* very small phones */
 @media(max-width:360px){
   .card { padding:28px 20px 24px; }
-  .hub-icon svg { max-width:48px; }
+  .hub-icon { max-width:150px; }
+  .hub-icon__art { max-width:clamp(80px,30vw,120px); }
   .hub-bow { width:40px; }
   .hub-title { font-size:1.55rem; }
   .greeting-title { font-size:2.8rem; }
@@ -593,8 +638,9 @@ img    { display:block; max-width:100%; }
 
 /* tablet / desktop: 4-across like web reference */
 @media(min-width:600px){
-  .hub-icons { max-width:620px; gap:40px 56px; }
-  .hub-icon svg { max-width:96px; }
+  .hub-icons { max-width:680px; gap:40px 56px; }
+  .hub-icon { max-width:160px; }
+  .hub-icon__art { max-width:112px; }
   .hub-bow { width:80px; }
   .corner-border { width:clamp(90px,22vw,180px); opacity:.38; }
 }
@@ -656,8 +702,8 @@ img    { display:block; max-width:100%; }
 
   <!-- GREETING -->
   <section class="screen active" id="screen-greeting" aria-label="Greeting">
-    <h1 class="greeting-title" contenteditable="true" spellcheck="false">hi, love!</h1>
-    <p class="greeting-sub" contenteditable="true">do you want to see a little surprise for you?</p>
+    <h1 class="greeting-title">hi, love!</h1>
+    <p class="greeting-sub">do you want to see a little surprise for you?</p>
     <div class="bouquet-wrap">
       <img class="bouquet-img" src="assets/bouquet.png" alt="A watercolor bouquet of peonies and tulips" />
     </div>
@@ -679,19 +725,19 @@ img    { display:block; max-width:100%; }
     <div class="hub-icons">
       <button class="hub-icon" data-target="photos" type="button" aria-label="Photo memories">
         <span class="hub-icon__dot" data-dot="photos"></span>
-        <svg viewBox="0 0 64 56"><use href="#icon-camera"></use></svg>
+        <img class="hub-icon__art" src="assets/icons/icon-photos.png" alt="" />
       </button>
       <button class="hub-icon" data-target="songs" type="button" aria-label="Songs">
         <span class="hub-icon__dot" data-dot="songs"></span>
-        <svg viewBox="0 0 64 56"><use href="#icon-headphones"></use></svg>
+        <img class="hub-icon__art" src="assets/icons/icon-songs.png" alt="" />
       </button>
       <button class="hub-icon" data-target="letters" type="button" aria-label="Letters">
         <span class="hub-icon__dot" data-dot="letters"></span>
-        <svg viewBox="0 0 64 48"><use href="#icon-envelope"></use></svg>
+        <img class="hub-icon__art" src="assets/icons/icon-letters.png" alt="" />
       </button>
       <button class="hub-icon" data-target="gift" type="button" aria-label="Gift">
         <span class="hub-icon__dot" data-dot="gift"></span>
-        <svg viewBox="0 0 64 64"><use href="#icon-gift"></use></svg>
+        <img class="hub-icon__art" src="assets/icons/icon-gift.png" alt="" />
       </button>
     </div>
 
@@ -707,9 +753,9 @@ img    { display:block; max-width:100%; }
       <img class="bow-img finale-bow" src="assets/bows/bow-1.png" alt="" aria-hidden="true" />
       <img class="finale-bouquet" src="assets/bouquet.png" alt="" aria-hidden="true" />
       <div class="finale-lines">
-        <p contenteditable="true">thank you for another year of being exactly you.</p>
-        <p contenteditable="true">however today goes, I hope it feels this warm.</p>
-        <p class="finale-signoff" contenteditable="true">happy birthday, <span id="finaleName">love</span> 💐</p>
+        <p>thank you for another year of being exactly you.</p>
+        <p>however today goes, I hope it feels this warm.</p>
+        <p class="finale-signoff">happy birthday, <span id="finaleName">love</span> 💐</p>
       </div>
       <button class="btn-replay" id="replayBtn" type="button">open it again ♡</button>
     </div>
@@ -727,35 +773,31 @@ img    { display:block; max-width:100%; }
   </div>
   <p class="overlay__eyebrow">little moments</p>
   <h3 class="overlay__title">captured for you</h3>
-  <p class="overlay__hint">tap a polaroid to add your photo</p>
+  <p class="overlay__hint">tap a photo to zoom in</p>
   <div class="photos-polaroids">
     <figure class="polaroid">
-      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
-        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+      <div class="polaroid__photo">
         <span class="polaroid__hint">+ add photo</span>
       </div>
-      <figcaption contenteditable="true">that day downtown</figcaption>
+      <figcaption>that day downtown</figcaption>
     </figure>
     <figure class="polaroid">
-      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
-        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+      <div class="polaroid__photo">
         <span class="polaroid__hint">+ add photo</span>
       </div>
-      <figcaption contenteditable="true">the road trip</figcaption>
+      <figcaption>the road trip</figcaption>
     </figure>
     <figure class="polaroid">
-      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
-        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+      <div class="polaroid__photo">
         <span class="polaroid__hint">+ add photo</span>
       </div>
-      <figcaption contenteditable="true">your best look</figcaption>
+      <figcaption>your best look</figcaption>
     </figure>
     <figure class="polaroid">
-      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
-        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
+      <div class="polaroid__photo">
         <span class="polaroid__hint">+ add photo</span>
       </div>
-      <figcaption contenteditable="true">last birthday</figcaption>
+      <figcaption>last birthday</figcaption>
     </figure>
   </div>
 </section>
@@ -767,28 +809,60 @@ img    { display:block; max-width:100%; }
   <p class="overlay__hint">tap one to read what's inside</p>
 
   <div class="envelope-row">
-    <button class="envelope-btn" data-letter="0" type="button" aria-label="Letter from mom">
+    <button class="envelope-btn" data-letter="0" type="button" aria-label="Letter from Fiel">
       <div class="envelope">
         <div class="envelope__body"></div>
         <div class="envelope__flap"></div>
         <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
-        <span class="envelope__label">mom</span>
+        <span class="envelope__label">Fiel</span>
       </div>
     </button>
-    <button class="envelope-btn" data-letter="1" type="button" aria-label="Letter from bestie">
+    <button class="envelope-btn" data-letter="1" type="button" aria-label="Letter from Lea">
       <div class="envelope">
         <div class="envelope__body"></div>
         <div class="envelope__flap"></div>
         <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
-        <span class="envelope__label">bestie</span>
+        <span class="envelope__label">Lea</span>
       </div>
     </button>
-    <button class="envelope-btn" data-letter="2" type="button" aria-label="Letter from family">
+    <button class="envelope-btn" data-letter="2" type="button" aria-label="Letter from Marga">
       <div class="envelope">
         <div class="envelope__body"></div>
         <div class="envelope__flap"></div>
         <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
-        <span class="envelope__label">family</span>
+        <span class="envelope__label">Marga</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="3" type="button" aria-label="Letter from Kuya RJ">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Kuya RJ</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="4" type="button" aria-label="Letter from Ate Ces">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Ate Ces</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="5" type="button" aria-label="Letter from Ate Elaine">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Ate Elaine</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="6" type="button" aria-label="Letter from Andreia">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Andreia</span>
       </div>
     </button>
   </div>
@@ -798,35 +872,13 @@ img    { display:block; max-width:100%; }
       <div class="scalloped-card__bow-wrap" aria-hidden="true">
         <img class="bow-img" src="assets/bows/bow-5.png" alt="" />
       </div>
-      <p class="scalloped-card__to"   id="letterTo"   contenteditable="true">my love,</p>
-      <p class="scalloped-card__body" id="letterBody" contenteditable="true">Happy birthday! You make every day brighter, every laugh louder, and my heart fuller. Here's to you — my joy, my favorite person, my everything.</p>
-      <p class="scalloped-card__sign" contenteditable="true">forever yours,<br><span id="letterFrom">y/n</span></p>
+      <p class="scalloped-card__to"   id="letterTo"  >my love,</p>
+      <p class="scalloped-card__body" id="letterBody">Happy birthday! You make every day brighter, every laugh louder, and my heart fuller. Here's to you — my joy, my favorite person, my everything.</p>
+      <p class="scalloped-card__sign">forever yours,<br><span id="letterFrom">y/n</span></p>
     </div>
   </div>
 
-  <div class="polaroid-strip" id="letterPolaroids">
-    <figure class="polaroid">
-      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
-        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
-        <span class="polaroid__hint">+ photo</span>
-      </div>
-      <figcaption contenteditable="true">us, always</figcaption>
-    </figure>
-    <figure class="polaroid">
-      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
-        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
-        <span class="polaroid__hint">+ photo</span>
-      </div>
-      <figcaption contenteditable="true">my fav smile</figcaption>
-    </figure>
-    <figure class="polaroid">
-      <div class="polaroid__photo" tabindex="0" role="button" aria-label="Add a photo">
-        <input type="file" accept="image/*" class="visually-hidden"><img alt="" />
-        <span class="polaroid__hint">+ photo</span>
-      </div>
-      <figcaption contenteditable="true">this one too</figcaption>
-    </figure>
-  </div>
+  <div class="polaroid-strip" id="letterPolaroids"></div>
 </section>
 
 <section class="overlay" id="overlay-songs" aria-label="Songs">
@@ -840,8 +892,8 @@ img    { display:block; max-width:100%; }
         <svg viewBox="0 0 48 48"><use href="#icon-vinyl"></use></svg>
       </button>
       <div>
-        <div class="track__title" contenteditable="true">song title — artist</div>
-        <div class="track__note"  contenteditable="true">this one's for the long drives</div>
+        <div class="track__title">song title — artist</div>
+        <div class="track__note" >this one's for the long drives</div>
       </div>
     </div>
     <div class="track">
@@ -849,8 +901,8 @@ img    { display:block; max-width:100%; }
         <svg viewBox="0 0 48 48"><use href="#icon-vinyl"></use></svg>
       </button>
       <div>
-        <div class="track__title" contenteditable="true">song title — artist</div>
-        <div class="track__note"  contenteditable="true">we played this way too loud</div>
+        <div class="track__title">song title — artist</div>
+        <div class="track__note" >we played this way too loud</div>
       </div>
     </div>
     <div class="track">
@@ -858,8 +910,8 @@ img    { display:block; max-width:100%; }
         <svg viewBox="0 0 48 48"><use href="#icon-vinyl"></use></svg>
       </button>
       <div>
-        <div class="track__title" contenteditable="true">song title — artist</div>
-        <div class="track__note"  contenteditable="true">the one that made you cry</div>
+        <div class="track__title">song title — artist</div>
+        <div class="track__note" >the one that made you cry</div>
       </div>
     </div>
   </div>
@@ -874,16 +926,81 @@ img    { display:block; max-width:100%; }
   <div class="gift-sketch" id="giftBox" role="button" tabindex="0" aria-label="Unwrap gift">
     <svg viewBox="0 0 64 64" width="100%" height="100%"><use href="#icon-gift"></use></svg>
   </div>
-  <div class="gift-message" contenteditable="true">Consider this an IOU — redeem for one real gift, chosen just with you in mind.</div>
+  <div class="gift-message">Consider this an IOU — redeem for one real gift, chosen just with you in mind.</div>
 </section>
+
+<div class="photo-lightbox" id="photoLightbox" aria-hidden="true">
+  <button class="photo-lightbox__close" type="button" aria-label="Close photo">✕</button>
+  <img class="photo-lightbox__img" id="photoLightboxImg" alt="" />
+  <p class="photo-lightbox__caption" id="photoLightboxCaption"></p>
+</div>
 
 <script>
 (function(){
   const state = { visited:{ photos:false, letters:false, songs:false, gift:false } };
   const letters = [
-    { to:'my love,', body:'Happy birthday! You make every day brighter, every laugh louder, and my heart fuller. Here\'s to you — my joy, my favorite person, my everything.', from:'mom' },
-    { to:'hey you,', body:'I don\'t say it enough, but I\'m really glad you exist. Thanks for every late-night talk, every dumb joke, and every time you showed up for me. Love you lots.', from:'your best friend' },
-    { to:'to our favorite person,', body:'We are so proud of the person you\'ve become. May this year bring you everything your heart has been quietly wishing for. We love you more than words can say.', from:'the whole family' }
+    {
+      to:'Bella!',
+      body:'First of all HAPEE BIRTHDAE!!! I miss you, our NS4 date with Cliffy, and gala sa greenfield. I hope you\'re having a blast. I\'m hapee I got you as my friend, even happier when we rekindle our friendship 🥹. Sana more gala soon please please please by Sabrina Carpenter. Inom soon!!!',
+      from:'Fiel',
+      photos:[
+        { src:'assets/letters/fiel-selfie.png', caption:'NS4 date with Cliffy' },
+        { src:'assets/letters/fiel-gala.png', caption:'gala sa greenfield' }
+      ]
+    },
+    {
+      to:'Hey Bella,',
+      body:'Happy birthday to our very Latina and monyeka friend🤭\n\nThank you for being such a big part of my college life, and hanggang ngayon ay you\'re still there kasi wala ka dito. I\'m really grateful to have a friend like you. Thank you for always being there during my happiest moments and even through my toughest days. Honestly, kahit presence mo lang, it\'s already enough to comfort me and make things feel a little lighter.\n\nI hope you always remember that I\'m here for you too, no matter what. Through all the highs and lows, you can always count on me just like I can count on you.\n\nEnjoy your special day and all the amazing things waiting for you ahead…your career, your dreams, and every opportunity that comes your way. You deserve all the happiness, success, and love this world has to offer.\n\nLove ya always🫶🥹',
+      from:'Lea',
+      photos:[
+        { src:'assets/letters/lea-mirror.png', caption:'college days' },
+        { src:'assets/letters/lea-call.png', caption:'hanggang ngayon' }
+      ]
+    },
+    {
+      to:'Hiii Yssa!!!',
+      body:'Happy birthday!!! 🥳💗\n\nFirst of all, I miss youuuu!! I miss singing ABBA songs with you, our BGC moments, lahat lahat. 😭 Every time im in bgc i literally think about you!!\n\nCan I just say, isa ka talaga sa mga friends ko na nag-boost ng confidence ko to wear crop tops. AS IN. Before, super nahihiya ako, but you always told me not to mind the people around me and just wear whatever makes me happy and confident and i still remember that hanggang ngayon 🥹💕SUPER THANKFUL!\n\nI\'m also so happy that you and Allen are still together. Grabe so strong!!! I can\'t believe I witnessed your broken-hearted era before, tapos dumating si Allen. 😭 Honestly, seeing you this happy makes me so happy too. Sobrang cute niyo talaga pls. I\'m just really happy that you found someone who loves and takes care of you the way you deserve.\n\nlagi ko naman sinasabi noon pa na sana hindi kayo maghiwalay kasi ramdam na ramdam ko talaga kung gaano niyo kamahal ang isa\'t isa.\n\nEnjoy your day, eat lots of good food, and make more happy memories!! You deserve all the love and happiness today and always. Miss you so much, birthday girl!! I love you always 🫶🏻🎂✨',
+      from:'Marga',
+      photos:[
+        { src:'assets/letters/marga-photobooth.png', caption:'BGC photobooth' }
+      ]
+    },
+    {
+      to:'Happy birthdayyy, Yssa! 🥳',
+      body:'May God bless you with health, peace, and endless joy throughout the year ahead and I pray that you feel surrounded by love and that your path is guided by faith and happiness! 🤗 Take Care alwayssss love youu! 🫶🏻🤍',
+      from:'Kuya RJ',
+      photos:[
+        { src:'assets/letters/kuya-rj-group.png', caption:'squad' }
+      ]
+    },
+    {
+      to:'Happy 23rd Birthday, Yssabella! 🎉🤍',
+      body:'It\'s amazing how the cousin we always considered and treated as the family\'s bunso is now 23, working, and building a life of her own. Time really flies.\n\nWe\'re so proud of the person you\'ve become and the beautiful journey of who you\'re still becoming😊 No matter how grown up you are, you\'ll always have a special place in our hearts as our beloved bunso.\n\nKeep shining, dreaming, and growing. We\'re always cheering you on every step of the way! 💖\n\nMe and Lyanne loves you so much! 😘',
+      from:'Ate Ces',
+      photos:[
+        { src:'assets/letters/ate-ces-call.png', caption:'birthday call' },
+        { src:'assets/letters/ate-ces-selfie.png', caption:'our bunso' },
+        { src:'assets/letters/ate-ces-lyanne.png', caption:'me and Lyanne' }
+      ]
+    },
+    {
+      to:'Happiest Birthday, Nene!',
+      body:'Please know that you are deeply loved and supported by everyone around you.\n\nTwenty-three years ago, you were given to us, our little bundle of joy who brought so much life and excitement into our world. Your playful spirit and your mom\'s supportive character have created countless joyful memories we will always cherish.\n\nFrom pageants and contests to trainings, and even your Halloween costume appearances at SM, these are just a few of the beautiful moments that make up your childhood memories.\n\nYou may have taken a different path through all the twists and turns life has brought you, but I hope you continue to see that despite the challenges, from health scares to your dad leaving, there have also been so many meaningful and beautiful things that shaped who you are today.\n\nYou are still very lucky to be blessed with a life that, while different from others, is truly meaningful in its own way.\n\nYou will always be the bunso in our hearts, even with Ate Joan in the picture, and I will always be your Ate Elaine. Plus, you still have your Kuya Bryan who admires you more than you probably realize. He appreciates your thoughtfulness and sweetness toward all of us.\n\nWe may not have as much bonding time as before, but always remember that we are just a call or chat away. Since day one, you can always count on us.\n\nLove you, Nene. Always and forever.',
+      from:'Ate Elaine',
+      photos:[
+        { src:'assets/letters/ate-elaine-then-now.png', caption:'then and now' },
+        { src:'assets/letters/ate-elaine-clinic.png', caption:'bonding time' },
+        { src:'assets/letters/ate-elaine-mirror.png', caption:'just a call away' }
+      ]
+    },
+    {
+      to:'Happy birthday, Ate Yssa!',
+      body:'I\'m so proud of the woman you\'ve become and everything you\'ve worked so hard for.\n\nI honestly wouldn\'t be the woman I am today without you. You\'ve shaped me in more ways than you probably realize, and I\'ll always be thankful for that.\n\nTake care of yourself palagi! I hope you find the happiness you deserve and achieve all the dreams you\'ve always prayed for.\n\nHappy birthday, Ate. I love you!',
+      from:'Andreia',
+      photos:[
+        { src:'assets/letters/andreia-mall.png', caption:'mall runs' }
+      ]
+    }
   ];
 
   function goTo(id){
@@ -914,12 +1031,67 @@ img    { display:block; max-width:100%; }
     document.querySelectorAll('.envelope-btn').forEach(b=>b.classList.remove('active'));
     document.getElementById('letterReveal').classList.remove('active');
     document.getElementById('letterPolaroids').classList.remove('active');
+    document.getElementById('letterPolaroids').innerHTML='';
+  }
+  function renderLetterPolaroids(photos){
+    const strip=document.getElementById('letterPolaroids');
+    strip.innerHTML='';
+    photos.forEach(p=>{
+      const fig=document.createElement('figure');
+      fig.className='polaroid has-photo';
+      fig.innerHTML=
+        '<div class="polaroid__photo" role="button" tabindex="0" aria-label="View photo">'+
+        '<img src="'+p.src+'" alt="" /></div>'+
+        '<figcaption>'+(p.caption||'')+'</figcaption>';
+      strip.appendChild(fig);
+    });
   }
 
   document.querySelectorAll('.hub-icon').forEach(i=>i.addEventListener('click',()=>openOverlay(i.dataset.target)));
   document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeOverlay));
   document.getElementById('overlayBackdrop').addEventListener('click',closeOverlay);
-  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeOverlay();});
+  document.addEventListener('keydown',e=>{
+    if(e.key!=='Escape')return;
+    if(document.getElementById('photoLightbox').classList.contains('active')) closePhotoLightbox();
+    else closeOverlay();
+  });
+
+  const lightbox=document.getElementById('photoLightbox');
+  const lightboxImg=document.getElementById('photoLightboxImg');
+  const lightboxCaption=document.getElementById('photoLightboxCaption');
+  function openPhotoLightbox(src,caption){
+    lightboxImg.src=src;
+    lightboxCaption.textContent=caption||'';
+    lightboxCaption.hidden=!caption;
+    lightbox.classList.add('active');
+    lightbox.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+  }
+  function closePhotoLightbox(){
+    lightbox.classList.remove('active');
+    lightbox.setAttribute('aria-hidden','true');
+    lightboxImg.src='';
+    lightboxCaption.textContent='';
+    document.body.style.overflow='';
+  }
+  lightbox.querySelector('.photo-lightbox__close').addEventListener('click',closePhotoLightbox);
+  lightbox.addEventListener('click',e=>{ if(e.target===lightbox) closePhotoLightbox(); });
+  document.addEventListener('click',e=>{
+    const img=e.target.closest('.polaroid.has-photo img');
+    if(!img||!img.src)return;
+    e.stopPropagation();
+    const caption=img.closest('.polaroid')?.querySelector('figcaption')?.textContent.trim()||'';
+    openPhotoLightbox(img.src,caption);
+  });
+  document.addEventListener('keydown',e=>{
+    const frame=e.target.closest('.polaroid.has-photo .polaroid__photo[role="button"]');
+    if(!frame||!(e.key==='Enter'||e.key===' '))return;
+    const img=frame.querySelector('img');
+    if(!img||!img.src)return;
+    e.preventDefault();
+    const caption=frame.closest('.polaroid')?.querySelector('figcaption')?.textContent.trim()||'';
+    openPhotoLightbox(img.src,caption);
+  });
 
   document.getElementById('yesBtn').addEventListener('click',()=>goTo('screen-hub'));
   document.getElementById('noBtn').addEventListener('click', ()=>goTo('screen-hub'));
@@ -939,21 +1111,16 @@ img    { display:block; max-width:100%; }
       document.getElementById('letterBody').textContent=l.body;
       document.getElementById('letterFrom').textContent=l.from;
       document.getElementById('letterReveal').classList.add('active');
-      document.getElementById('letterPolaroids').classList.add('active');
+      if(l.photos&&l.photos.length){
+        renderLetterPolaroids(l.photos);
+        document.getElementById('letterPolaroids').classList.add('active');
+      }else{
+        document.getElementById('letterPolaroids').innerHTML='';
+        document.getElementById('letterPolaroids').classList.remove('active');
+      }
     });
   });
 
-  document.querySelectorAll('.polaroid__photo').forEach(frame=>{
-    const input=frame.querySelector('input[type=file]'), img=frame.querySelector('img');
-    frame.addEventListener('click',()=>input.click());
-    frame.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();input.click();}});
-    input.addEventListener('change',()=>{
-      const f=input.files[0]; if(!f)return;
-      const r=new FileReader();
-      r.onload=()=>{img.src=r.result;frame.closest('.polaroid').classList.add('has-photo');};
-      r.readAsDataURL(f);
-    });
-  });
 
   document.querySelectorAll('.track__vinyl').forEach(btn=>{
     btn.addEventListener('click',()=>{
