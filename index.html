@@ -180,14 +180,19 @@ img    { display:block; max-width:100%; }
   50%      { transform:translateY(-8px); }
 }
 .choice-row {
-  display:flex; align-items:center; justify-content:center;
-  gap:20px; flex-wrap:wrap;
-  position:relative;
-  min-height:88px;
+  display:flex; flex-direction:column; align-items:center;
+  gap:18px;
   width:100%;
   max-width:420px;
   margin:0 auto;
 }
+.choice-row__dodge-zone {
+  position:relative;
+  width:100%;
+  min-height:48px;
+  display:flex; align-items:center; justify-content:center;
+}
+.choice-row__dodge-zone.is-active { min-height:96px; }
 .btn-yes {
   font-family:var(--ff-hand); font-size:clamp(1.15rem,4vw,1.45rem);
   letter-spacing:.02em;
@@ -196,7 +201,7 @@ img    { display:block; max-width:100%; }
   color:var(--white);
   box-shadow:0 6px 22px rgba(212,105,138,.4);
   transition:transform .35s var(--spring),box-shadow .2s,font-size .35s var(--spring);
-  z-index:1;
+  flex-shrink:0;
 }
 .btn-yes:hover  { transform:translateY(-2px) scale(1.02); box-shadow:0 10px 28px rgba(212,105,138,.5); }
 .btn-yes:active { transform:scale(.97); }
@@ -207,12 +212,14 @@ img    { display:block; max-width:100%; }
   transition:left .28s var(--spring),top .28s var(--spring),color .2s,transform .28s var(--spring);
   padding:8px 12px;
   white-space:nowrap;
+  background:none;
+  border:none;
 }
 .btn-no:hover { color:var(--accent); }
 .btn-no.is-dodging {
   position:absolute;
   text-decoration:none;
-  z-index:3;
+  z-index:2;
 }
 .btn-no.is-yes-now {
   text-decoration:none;
@@ -738,7 +745,9 @@ img    { display:block; max-width:100%; }
     </div>
     <div class="choice-row">
       <button class="btn-yes" id="yesBtn" type="button">yes!!</button>
-      <button class="btn-no"  id="noBtn"  type="button">no, thanks.</button>
+      <div class="choice-row__dodge-zone" id="noDodgeZone">
+        <button class="btn-no" id="noBtn" type="button">no, thanks.</button>
+      </div>
     </div>
   </section>
 
@@ -1159,7 +1168,7 @@ img    { display:block; max-width:100%; }
   (function(){
     const noBtn=document.getElementById('noBtn');
     const yesBtn=document.getElementById('yesBtn');
-    const choiceRow=document.querySelector('.choice-row');
+    const noZone=document.getElementById('noDodgeZone');
     let noAttempts=0;
     const noTexts=[
       'no, thanks.',
@@ -1176,17 +1185,19 @@ img    { display:block; max-width:100%; }
       noBtn.classList.remove('is-dodging','is-yes-now');
       noBtn.style.left='';
       noBtn.style.top='';
+      noZone.classList.remove('is-active');
       yesBtn.style.transform='';
       yesBtn.style.fontSize='';
     }
 
     function dodgeNoBtn(){
-      const pad=8;
-      const maxX=Math.max(pad, choiceRow.clientWidth-noBtn.offsetWidth-pad);
-      const maxY=Math.max(pad, choiceRow.clientHeight-noBtn.offsetHeight-pad);
+      noZone.classList.add('is-active');
       noBtn.classList.add('is-dodging');
-      noBtn.style.left=Math.round(Math.random()*maxX)+'px';
-      noBtn.style.top=Math.round(Math.random()*maxY)+'px';
+      const pad=10;
+      const maxX=Math.max(0, noZone.clientWidth-noBtn.offsetWidth-pad*2);
+      const maxY=Math.max(0, noZone.clientHeight-noBtn.offsetHeight-pad*2);
+      noBtn.style.left=(pad+Math.round(Math.random()*maxX))+'px';
+      noBtn.style.top=(pad+Math.round(Math.random()*maxY))+'px';
     }
 
     noBtn.addEventListener('click',e=>{
