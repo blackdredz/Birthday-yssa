@@ -557,7 +557,7 @@ img    { display:block; max-width:100%; }
 }
 
 /* ── responsive ─────────────────────────────────── */
-/* phone: diamond icon layout, scaled-up type & icons */
+/* phone: 2×2 icon grid, scaled-up type & icons */
 @media(max-width:480px){
   #app {
     padding:max(28px, env(safe-area-inset-top)) 20px max(24px, env(safe-area-inset-bottom));
@@ -568,12 +568,11 @@ img    { display:block; max-width:100%; }
   .hub-bow { width:clamp(44px,12vw,60px); }
   .hub-title { font-size:clamp(1.75rem,8.5vw,2.35rem); }
   .hub-icons {
-    grid-template-columns:repeat(3,1fr);
-    gap:clamp(20px,6vw,32px) clamp(12px,4vw,20px);
-    max-width:min(100%,340px);
+    grid-template-columns:repeat(2,1fr);
+    gap:clamp(24px,7vw,36px) clamp(16px,5vw,28px);
+    max-width:min(100%,320px);
     padding:0 8px;
   }
-  .hub-icon[data-target="gift"] { grid-column:2; grid-row:2; }
   .hub-icon svg { max-width:clamp(52px,20vw,80px); }
   .hub-footer { gap:22px; }
   .btn-finish { min-width:100%; padding:15px 24px; font-size:1.05rem; }
