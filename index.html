@@ -182,6 +182,11 @@ img    { display:block; max-width:100%; }
 .choice-row {
   display:flex; align-items:center; justify-content:center;
   gap:20px; flex-wrap:wrap;
+  position:relative;
+  min-height:88px;
+  width:100%;
+  max-width:420px;
+  margin:0 auto;
 }
 .btn-yes {
   font-family:var(--ff-hand); font-size:clamp(1.15rem,4vw,1.45rem);
@@ -190,7 +195,8 @@ img    { display:block; max-width:100%; }
   background:linear-gradient(135deg,#E0759A,var(--accent-d));
   color:var(--white);
   box-shadow:0 6px 22px rgba(212,105,138,.4);
-  transition:transform .2s var(--spring),box-shadow .2s;
+  transition:transform .35s var(--spring),box-shadow .2s,font-size .35s var(--spring);
+  z-index:1;
 }
 .btn-yes:hover  { transform:translateY(-2px) scale(1.02); box-shadow:0 10px 28px rgba(212,105,138,.5); }
 .btn-yes:active { transform:scale(.97); }
@@ -198,9 +204,29 @@ img    { display:block; max-width:100%; }
   font-family:var(--ff-hand); font-size:clamp(1rem,3.5vw,1.2rem); color:var(--accent-l);
   text-decoration:underline; text-decoration-style:wavy;
   text-decoration-color:var(--accent-l); text-underline-offset:4px;
-  transition:color .2s;
+  transition:left .28s var(--spring),top .28s var(--spring),color .2s,transform .28s var(--spring);
+  padding:8px 12px;
+  white-space:nowrap;
 }
 .btn-no:hover { color:var(--accent); }
+.btn-no.is-dodging {
+  position:absolute;
+  text-decoration:none;
+  z-index:3;
+}
+.btn-no.is-yes-now {
+  text-decoration:none;
+  padding:16px 40px;
+  border-radius:999px;
+  background:linear-gradient(135deg,#E0759A,var(--accent-d));
+  color:var(--white);
+  box-shadow:0 6px 22px rgba(212,105,138,.4);
+  animation:yesReveal .45s var(--spring) both;
+}
+@keyframes yesReveal {
+  from { opacity:0; transform:scale(.7) rotate(-6deg); }
+  to   { opacity:1; transform:scale(1) rotate(0); }
+}
 
 /* ── hub (open layout, big icons like reference) ─ */
 .hub-back {
@@ -485,7 +511,7 @@ img    { display:block; max-width:100%; }
 .envelope-row {
   display:flex; justify-content:center;
   gap:clamp(8px,3vw,16px); margin:6px 0 22px; flex-wrap:wrap;
-  max-width:520px; margin-left:auto; margin-right:auto;
+  max-width:560px; margin-left:auto; margin-right:auto;
 }
 .envelope-btn { padding:4px; transition:transform .28s var(--spring); }
 .envelope-btn:hover  { transform:translateY(-8px) rotate(-2deg); }
@@ -556,6 +582,9 @@ img    { display:block; max-width:100%; }
 .polaroid-strip { display:none; justify-content:center; gap:10px; flex-wrap:wrap; width:100%; }
 .polaroid-strip.active { display:flex; animation:rise .4s .1s var(--ease) both; }
 .polaroid-strip .polaroid { width:clamp(78px,20vw,96px); }
+.polaroid--portrait { width:clamp(120px,34vw,160px) !important; }
+.polaroid--portrait .polaroid__photo { aspect-ratio:3/4; }
+.polaroid--portrait .polaroid__photo img { object-fit:contain; background:var(--blush); }
 
 /* ── songs ──────────────────────────────────────── */
 .tracks { display:flex; flex-direction:column; gap:8px; text-align:left; }
@@ -865,6 +894,22 @@ img    { display:block; max-width:100%; }
         <span class="envelope__label">Andreia</span>
       </div>
     </button>
+    <button class="envelope-btn" data-letter="7" type="button" aria-label="Letter from Daddy Dan">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Daddy Dan</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="8" type="button" aria-label="Letter from Mommy Janice">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Mommy Janice</span>
+      </div>
+    </button>
   </div>
 
   <div class="letter-reveal" id="letterReveal">
@@ -1000,6 +1045,22 @@ img    { display:block; max-width:100%; }
       photos:[
         { src:'assets/letters/andreia-mall.png', caption:'mall runs' }
       ]
+    },
+    {
+      to:'Yssa,',
+      body:'You are the best fake daughter ever... and drinking buddy! Cheers to being 23 on the 23rd! This will be a great year!',
+      from:'Daddy Dan',
+      photos:[
+        { src:'assets/letters/daddy-dan.png', caption:'23 on the 23rd 🥂', portrait:true }
+      ]
+    },
+    {
+      to:'Happy Birthday my baby gurl!',
+      body:'I love you and I am so proud of what You\'ve become! Enjoy life and always remember I\'m always here behind your back! I miss you! Xoxo',
+      from:'Mommy Janice',
+      photos:[
+        { src:'assets/letters/mommy-janice.png', caption:'xoxo', portrait:true }
+      ]
     }
   ];
 
@@ -1038,7 +1099,7 @@ img    { display:block; max-width:100%; }
     strip.innerHTML='';
     photos.forEach(p=>{
       const fig=document.createElement('figure');
-      fig.className='polaroid has-photo';
+      fig.className='polaroid has-photo'+(p.portrait?' polaroid--portrait':'');
       fig.innerHTML=
         '<div class="polaroid__photo" role="button" tabindex="0" aria-label="View photo">'+
         '<img src="'+p.src+'" alt="" /></div>'+
@@ -1094,7 +1155,73 @@ img    { display:block; max-width:100%; }
   });
 
   document.getElementById('yesBtn').addEventListener('click',()=>goTo('screen-hub'));
-  document.getElementById('noBtn').addEventListener('click', ()=>goTo('screen-hub'));
+
+  (function(){
+    const noBtn=document.getElementById('noBtn');
+    const yesBtn=document.getElementById('yesBtn');
+    const choiceRow=document.querySelector('.choice-row');
+    let noAttempts=0;
+    const noTexts=[
+      'no, thanks.',
+      'are you sure? 🥺',
+      'pretty please?',
+      'you\'re breaking my heart 😭',
+      'nice try lol',
+      'okay fine, YES!!'
+    ];
+
+    function resetNoBtn(){
+      noAttempts=0;
+      noBtn.textContent=noTexts[0];
+      noBtn.classList.remove('is-dodging','is-yes-now');
+      noBtn.style.left='';
+      noBtn.style.top='';
+      yesBtn.style.transform='';
+      yesBtn.style.fontSize='';
+    }
+
+    function dodgeNoBtn(){
+      const pad=8;
+      const maxX=Math.max(pad, choiceRow.clientWidth-noBtn.offsetWidth-pad);
+      const maxY=Math.max(pad, choiceRow.clientHeight-noBtn.offsetHeight-pad);
+      noBtn.classList.add('is-dodging');
+      noBtn.style.left=Math.round(Math.random()*maxX)+'px';
+      noBtn.style.top=Math.round(Math.random()*maxY)+'px';
+    }
+
+    noBtn.addEventListener('click',e=>{
+      e.preventDefault();
+      if(noBtn.classList.contains('is-yes-now')){
+        goTo('screen-hub');
+        return;
+      }
+      noAttempts++;
+      yesBtn.style.transform='scale('+(1+noAttempts*.1)+')';
+      if(noAttempts>=noTexts.length-1){
+        noBtn.textContent=noTexts[noTexts.length-1];
+        noBtn.classList.remove('is-dodging');
+        noBtn.classList.add('is-yes-now');
+        noBtn.style.left='';
+        noBtn.style.top='';
+        yesBtn.style.transform='scale(1.15)';
+        return;
+      }
+      noBtn.textContent=noTexts[noAttempts];
+      dodgeNoBtn();
+    });
+
+    noBtn.addEventListener('mouseenter',()=>{
+      if(noAttempts>0&&!noBtn.classList.contains('is-yes-now')) dodgeNoBtn();
+    });
+
+    noBtn.addEventListener('touchstart',()=>{
+      if(noAttempts>0&&!noBtn.classList.contains('is-yes-now')) dodgeNoBtn();
+    },{passive:true});
+
+    document.getElementById('backBtn').addEventListener('click',resetNoBtn);
+    document.getElementById('replayBtn').addEventListener('click',resetNoBtn);
+  })();
+
   document.getElementById('backBtn').addEventListener('click',()=>goTo('screen-greeting'));
   document.getElementById('finishBtn').addEventListener('click',function(){if(!this.disabled)goTo('screen-finale');});
   document.getElementById('replayBtn').addEventListener('click',()=>{
