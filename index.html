@@ -350,15 +350,27 @@ img    { display:block; max-width:100%; }
   filter:drop-shadow(0 10px 20px rgba(212,105,138,.16));
   animation:bob 5s ease-in-out infinite;
 }
-.finale-lines { display:flex; flex-direction:column; gap:8px; }
+.finale-lines {
+  display:flex; flex-direction:column; gap:14px;
+  text-align:left;
+}
 .finale-lines p {
   font-family:var(--ff-display); font-style:italic;
-  font-size:clamp(1.15rem,3.8vw,1.5rem);
-  line-height:1.55; color:var(--ink);
+  font-size:clamp(.95rem,3.2vw,1.12rem);
+  line-height:1.65; color:var(--ink);
+}
+.finale-lines__greeting {
+  font-family:var(--ff-hand);
+  font-style:normal;
+  font-size:clamp(1.35rem,4.2vw,1.65rem) !important;
+  color:var(--accent-d) !important;
+  margin-bottom:2px;
 }
 .finale-signoff {
-  font-size:clamp(1.35rem,4.5vw,1.8rem) !important;
-  color:var(--accent) !important; margin-top:4px;
+  font-size:clamp(1.05rem,3.4vw,1.25rem) !important;
+  color:var(--accent) !important;
+  margin-top:6px;
+  text-align:right;
 }
 .btn-replay {
   margin-top:24px;
@@ -974,19 +986,41 @@ img    { display:block; max-width:100%; }
 
 /* ── gift ───────────────────────────────────────── */
 .gift-sketch {
-  width:130px; height:120px; margin:6px auto 20px;
-  cursor:pointer; color:var(--accent);
-  transition:transform .3s var(--spring);
+  position:relative;
+  width:clamp(120px,36vw,160px); height:clamp(110px,32vw,148px); margin:6px auto 20px;
+  cursor:pointer;
+  transition:width .35s var(--spring), height .35s var(--spring), transform .3s var(--spring);
 }
+.gift-sketch.opened {
+  width:clamp(170px,48vw,240px); height:clamp(150px,42vw,210px);
+  animation:giftPop .5s var(--spring);
+}
+.gift-sketch img {
+  position:absolute; inset:0;
+  width:100%; height:100%;
+  object-fit:contain;
+  pointer-events:none;
+  user-select:none;
+  transition:opacity .35s ease, transform .35s var(--spring);
+}
+.gift-sketch__closed { opacity:1; transform:scale(1); }
+.gift-sketch__opened { opacity:0; transform:scale(.92); }
+.gift-sketch.opened .gift-sketch__closed { opacity:0; transform:scale(.88); }
+.gift-sketch.opened .gift-sketch__opened { opacity:1; transform:scale(1); }
 .gift-sketch:hover { transform:scale(1.06) rotate(-2deg); }
-.gift-sketch.opened { animation:giftPop .5s var(--spring); }
+.gift-sketch.opened:hover { transform:scale(1.04) rotate(0deg); }
 @keyframes giftPop { 50%{transform:scale(1.12) rotate(-4deg);} }
 .gift-message {
+  display:none;
   font-family:var(--ff-display); font-style:italic;
   font-size:clamp(1rem,3.2vw,1.2rem); line-height:1.6;
   color:var(--accent-d); padding:18px 20px;
   background:var(--blush); border-radius:16px;
   border:1px solid rgba(212,105,138,.14);
+}
+.gift-message.active {
+  display:block;
+  animation:rise .45s .15s var(--ease) both;
 }
 
 /* ── responsive ─────────────────────────────────── */
@@ -1082,6 +1116,7 @@ img    { display:block; max-width:100%; }
 <audio id="bgm" loop preload="metadata" aria-label="Background music">
   <source src="assets/music/ivory-lilies.mp3" type="audio/mpeg" />
 </audio>
+<audio id="mp3Audio" preload="metadata" aria-label="Soundtrack player"></audio>
 <button class="music-toggle" id="musicToggle" type="button" aria-label="Play background music" aria-pressed="false">♫</button>
 
 <svg style="display:none" aria-hidden="true">
@@ -1178,9 +1213,11 @@ img    { display:block; max-width:100%; }
       <img class="bow-img finale-bow" src="assets/bows/bow-1.png" alt="" aria-hidden="true" />
       <img class="finale-bouquet" src="assets/bouquet.png" alt="" aria-hidden="true" />
       <div class="finale-lines">
-        <p>thank you for another year of being exactly you.</p>
-        <p>however today goes, I hope it feels this warm.</p>
-        <p class="finale-signoff">happy birthday, <span id="finaleName">love</span> 💐</p>
+        <p class="finale-lines__greeting">Hi Love!</p>
+        <p>For the past years I've made sure that your birthday is one not to be easily forgotten. Up to this point, I have enjoyed every 23rd of June because you just meant so much to me. Despite having a rough year together, I have learned a lot more on how to handle ourselves and becoming better and having such a strong bond together. We've experienced a lot of new things and I would love to experience it all over again together with you.</p>
+        <p>You came from not looking forward to your day to making sure your day includes me! (and your Family.. And Friends.) and now you're taking it up another step by spreading Kindness to people that is less fortunate than us. You amaze me a lot.</p>
+        <p>Happy Birthday Love, Continue being kind and loving to people that surrounds you. You mean the world to me. Thank you for letting me spend your birthday together for the past few years. may God give you more blessings to share, I'll be behind you and support you no matter What.</p>
+        <p class="finale-signoff">Love,<br>Allen.</p>
       </div>
       <button class="btn-replay" id="replayBtn" type="button">open it again ♡</button>
     </div>
@@ -1485,6 +1522,22 @@ img    { display:block; max-width:100%; }
         <span class="envelope__label">Joseph</span>
       </div>
     </button>
+    <button class="envelope-btn" data-letter="18" type="button" aria-label="Letter from Ate Joanne">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Ate Joanne</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="19" type="button" aria-label="Letter from Hester">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Hester</span>
+      </div>
+    </button>
   </div>
 
   <div class="letter-reveal" id="letterReveal">
@@ -1537,22 +1590,22 @@ img    { display:block; max-width:100%; }
       <div class="mp3track" data-index="0">
         <div class="mp3track__disc">01</div>
         <div class="mp3track__info">
-          <div class="mp3track__title">song title — artist</div>
-          <div class="mp3track__note">this one's for the long drives</div>
+          <div class="mp3track__title">Sherbet Sky — Lily Pichu</div>
+          <div class="mp3track__note">for you ♡</div>
         </div>
       </div>
       <div class="mp3track" data-index="1">
         <div class="mp3track__disc">02</div>
         <div class="mp3track__info">
-          <div class="mp3track__title">song title — artist</div>
-          <div class="mp3track__note">we played this way too loud</div>
+          <div class="mp3track__title">Yesterday — Sam Tompkins</div>
+          <div class="mp3track__note">the beatles cover</div>
         </div>
       </div>
       <div class="mp3track" data-index="2">
         <div class="mp3track__disc">03</div>
         <div class="mp3track__info">
-          <div class="mp3track__title">song title — artist</div>
-          <div class="mp3track__note">the one that made you cry</div>
+          <div class="mp3track__title">Glue Song — Yebit</div>
+          <div class="mp3track__note">beabadoobee cover</div>
         </div>
       </div>
     </div>
@@ -1566,9 +1619,10 @@ img    { display:block; max-width:100%; }
   <h3 class="overlay__title">just for you</h3>
   <p class="overlay__hint">tap the gift to unwrap it</p>
   <div class="gift-sketch" id="giftBox" role="button" tabindex="0" aria-label="Unwrap gift">
-    <svg viewBox="0 0 64 64" width="100%" height="100%"><use href="#icon-gift"></use></svg>
+    <img class="gift-sketch__closed" src="assets/icons/icon-gift.png" alt="" />
+    <img class="gift-sketch__opened" src="assets/icons/gift-opened.png" alt="" />
   </div>
-  <div class="gift-message">Consider this an IOU — redeem for one real gift, chosen just with you in mind.</div>
+  <div class="gift-message" id="giftMessage" aria-live="polite">A Birthday Cake and A Clothing Coupon for you!</div>
 </section>
 
 <div class="photo-lightbox" id="photoLightbox" aria-hidden="true">
@@ -1760,6 +1814,19 @@ img    { display:block; max-width:100%; }
       photos:[
         { src:'assets/letters/joseph-camera.png', caption:'rooting for you', portrait:true }
       ]
+    },
+    {
+      to:'Nene!',
+      body:'Happy Birthday Nene! I love you so much! 🫂🫶',
+      from:'Ate Joanne'
+    },
+    {
+      to:'Happy birthday!!',
+      body:'As a person that yaps, I don\'t know what to say HAHAHAHAHA but I am excited to see you soon. It\'s been a long time coming — we have been talking about doing this for years and now it\'s just a week away! I wish you all the happiness there is and I gotchu always.',
+      from:'Hester',
+      photos:[
+        { src:'assets/letters/hester-cat.png', caption:'see you soon', portrait:true }
+      ]
     }
   ];
 
@@ -1787,7 +1854,16 @@ img    { display:block; max-width:100%; }
     document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('active'));
     document.getElementById('overlayBackdrop').classList.remove('active');
     resetLetterView();
+    closePhotoLightbox();
+    resetViewmaster();
+    resetGift();
     if(window._mp3StopPlayer) window._mp3StopPlayer();
+  }
+  function resetGift(){
+    const gift=document.getElementById('giftBox');
+    gift.classList.remove('opened');
+    gift.setAttribute('aria-label','Unwrap gift');
+    document.getElementById('giftMessage').classList.remove('active');
   }
   function resetLetterView(){
     document.querySelectorAll('.envelope-btn').forEach(b=>b.classList.remove('active'));
@@ -1810,8 +1886,14 @@ img    { display:block; max-width:100%; }
   }
 
   document.querySelectorAll('.hub-icon').forEach(i=>i.addEventListener('click',()=>openOverlay(i.dataset.target)));
-  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',closeOverlay));
-  document.getElementById('overlayBackdrop').addEventListener('click',closeOverlay);
+  document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',e=>{
+    e.stopPropagation();
+    closeOverlay();
+  }));
+  document.getElementById('overlayBackdrop').addEventListener('click',e=>{
+    e.stopPropagation();
+    closeOverlay();
+  });
   document.addEventListener('keydown',e=>{
     if(e.key!=='Escape')return;
     if(document.getElementById('photoLightbox').classList.contains('active')) closePhotoLightbox();
@@ -1841,6 +1923,7 @@ img    { display:block; max-width:100%; }
   document.addEventListener('click',e=>{
     const img=e.target.closest('.polaroid.has-photo img');
     if(!img||!img.src)return;
+    if(!img.closest('.overlay.active')) return;
     e.stopPropagation();
     const caption=img.closest('.polaroid')?.querySelector('figcaption')?.textContent.trim()||'';
     openPhotoLightbox(img.src,caption);
@@ -1848,6 +1931,7 @@ img    { display:block; max-width:100%; }
   document.addEventListener('keydown',e=>{
     const frame=e.target.closest('.polaroid.has-photo .polaroid__photo[role="button"]');
     if(!frame||!(e.key==='Enter'||e.key===' '))return;
+    if(!frame.closest('.overlay.active')) return;
     const img=frame.querySelector('img');
     if(!img||!img.src)return;
     e.preventDefault();
@@ -1963,6 +2047,7 @@ img    { display:block; max-width:100%; }
 
   vmLeverOuter.addEventListener('click',pullViewmasterLever);
   vmDisplay.addEventListener('click',()=>{
+    if(!document.getElementById('overlay-photos').classList.contains('active')) return;
     const src=photoReel[vmIndex];
     if(src) openPhotoLightbox(src,'');
   });
@@ -2067,24 +2152,30 @@ img    { display:block; max-width:100%; }
   /* ── MP3 Player ── */
   (function(){
     const tracks = [
-      { title:'song title — artist', note:"this one's for the long drives" },
-      { title:'song title — artist', note:'we played this way too loud' },
-      { title:'song title — artist', note:'the one that made you cry' }
+      { title:'Sherbet Sky — Lily Pichu', note:'for you ♡', src:'assets/music/sherbet-sky.mp3' },
+      { title:'Yesterday — Sam Tompkins', note:'the beatles cover', src:'assets/music/yesterday-sam-tompkins.mp3' },
+      { title:'Glue Song — Yebit', note:'beabadoobee cover', src:'assets/music/glue-song-yebit.mp3' }
     ];
 
     let currentIdx = -1;
     let isPlaying = false;
     const BGM_NORMAL = 0.32;
     const BGM_DUCKED = 0.06;
+    const TRACK_VOL = 0.85;
     let fadeTimer = null;
 
+    const mp3Audio  = document.getElementById('mp3Audio');
     const mp3Title  = document.getElementById('mp3Title');
     const mp3Sub    = document.getElementById('mp3Sub');
     const mp3Status = document.getElementById('mp3Status');
     const mp3Play   = document.getElementById('mp3Play');
     const mp3Prev   = document.getElementById('mp3Prev');
     const mp3Next   = document.getElementById('mp3Next');
+    const mp3VolUp  = document.getElementById('mp3VolUp');
+    const mp3VolDown= document.getElementById('mp3VolDown');
     const trackEls  = document.querySelectorAll('.mp3track');
+
+    mp3Audio.volume = TRACK_VOL;
 
     function fadeBgmTo(target, ms){
       if(fadeTimer) clearInterval(fadeTimer);
@@ -2118,14 +2209,20 @@ img    { display:block; max-width:100%; }
 
     function playTrack(idx){
       currentIdx = ((idx % tracks.length) + tracks.length) % tracks.length;
-      isPlaying  = true;
+      const t = tracks[currentIdx];
+      if(mp3Audio.dataset.track !== String(currentIdx)){
+        mp3Audio.src = t.src;
+        mp3Audio.dataset.track = String(currentIdx);
+      }
+      isPlaying = true;
       fadeBgmTo(BGM_DUCKED, 600);
-      if(bgm.paused) bgm.play().catch(()=>{});
+      mp3Audio.play().catch(function(){});
       updateScreen();
     }
 
     function pauseTrack(){
       isPlaying = false;
+      mp3Audio.pause();
       fadeBgmTo(BGM_NORMAL, 600);
       updateScreen();
     }
@@ -2133,6 +2230,9 @@ img    { display:block; max-width:100%; }
     function stopPlayer(){
       currentIdx = -1;
       isPlaying  = false;
+      mp3Audio.pause();
+      mp3Audio.currentTime = 0;
+      delete mp3Audio.dataset.track;
       fadeBgmTo(BGM_NORMAL, 800);
       updateScreen();
     }
@@ -2151,6 +2251,19 @@ img    { display:block; max-width:100%; }
       playTrack(currentIdx < 0 ? 0 : currentIdx + 1);
     });
 
+    mp3VolUp.addEventListener('click',()=>{
+      mp3Audio.volume = Math.min(1, mp3Audio.volume + 0.1);
+    });
+
+    mp3VolDown.addEventListener('click',()=>{
+      mp3Audio.volume = Math.max(0, mp3Audio.volume - 0.1);
+    });
+
+    mp3Audio.addEventListener('ended',()=>{
+      if(tracks.length > 1) playTrack(currentIdx + 1);
+      else pauseTrack();
+    });
+
     trackEls.forEach((el,i)=>{
       el.addEventListener('click',()=> playTrack(i));
     });
@@ -2159,7 +2272,13 @@ img    { display:block; max-width:100%; }
   })();
 
   const gift=document.getElementById('giftBox');
-  function unwrap(){gift.classList.toggle('opened');}
+  const giftMessage=document.getElementById('giftMessage');
+  function unwrap(){
+    gift.classList.toggle('opened');
+    const opened=gift.classList.contains('opened');
+    gift.setAttribute('aria-label', opened ? 'Gift opened' : 'Unwrap gift');
+    giftMessage.classList.toggle('active', opened);
+  }
   gift.addEventListener('click',unwrap);
   gift.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();unwrap();}});
 
