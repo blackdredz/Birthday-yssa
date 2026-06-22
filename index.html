@@ -382,6 +382,88 @@ img    { display:block; max-width:100%; }
 }
 .btn-replay:hover { background:var(--blush); border-color:var(--accent); }
 
+@media (max-width:480px){
+  html:has(#screen-finale.active),
+  html:has(#screen-finale.active) body {
+    overflow:hidden;
+    height:100dvh;
+  }
+  #app:has(#screen-finale.active){
+    align-items:flex-start;
+    justify-content:center;
+    height:100dvh;
+    max-height:100dvh;
+    overflow:hidden;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      14px
+      max(8px, env(safe-area-inset-bottom));
+  }
+  #screen-finale.active{
+    flex:1;
+    min-height:0;
+    max-height:100%;
+    justify-content:center;
+  }
+  #screen-finale .card{
+    padding:16px 14px 12px;
+    border-radius:22px;
+  }
+  #screen-finale .finale-bow{
+    width:46px;
+    margin-bottom:4px;
+  }
+  #screen-finale .finale-bouquet{
+    width:70px;
+    margin-bottom:6px;
+  }
+  #screen-finale .finale-lines{ gap:6px; }
+  #screen-finale .finale-lines p{
+    font-size:0.76rem;
+    line-height:1.42;
+  }
+  #screen-finale .finale-lines__greeting{
+    font-size:1.1rem !important;
+    line-height:1.15 !important;
+    margin-bottom:0;
+  }
+  #screen-finale .finale-signoff{
+    font-size:0.82rem !important;
+    line-height:1.25 !important;
+    margin-top:0;
+  }
+  #screen-finale .btn-replay{
+    margin-top:8px;
+    padding:7px 16px;
+    font-size:0.72rem;
+  }
+}
+
+@media (max-width:390px){
+  #screen-finale .card{ padding:12px 12px 10px; }
+  #screen-finale .finale-bow{
+    width:38px;
+    margin-bottom:2px;
+  }
+  #screen-finale .finale-bouquet{
+    width:56px;
+    margin-bottom:4px;
+    animation:none;
+  }
+  #screen-finale .finale-lines{ gap:4px; }
+  #screen-finale .finale-lines p{
+    font-size:0.6875rem;
+    line-height:1.36;
+  }
+  #screen-finale .finale-lines__greeting{ font-size:1rem !important; }
+  #screen-finale .finale-signoff{ font-size:0.76rem !important; }
+  #screen-finale .btn-replay{
+    margin-top:6px;
+    padding:6px 14px;
+    font-size:0.68rem;
+  }
+}
+
 /* ── overlay backdrop ───────────────────────────── */
 .overlay-backdrop {
   position:fixed; inset:0;
@@ -1538,6 +1620,22 @@ img    { display:block; max-width:100%; }
         <span class="envelope__label">Hester</span>
       </div>
     </button>
+    <button class="envelope-btn" data-letter="20" type="button" aria-label="Letter from Jacob">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Jacob</span>
+      </div>
+    </button>
+    <button class="envelope-btn" data-letter="21" type="button" aria-label="Letter from Mommy Mai">
+      <div class="envelope">
+        <div class="envelope__body"></div>
+        <div class="envelope__flap"></div>
+        <svg class="envelope__bow-svg" viewBox="0 0 40 28" aria-hidden="true"><use href="#icon-bow-mini"></use></svg>
+        <span class="envelope__label">Mommy Mai</span>
+      </div>
+    </button>
   </div>
 
   <div class="letter-reveal" id="letterReveal">
@@ -1826,6 +1924,23 @@ img    { display:block; max-width:100%; }
       from:'Hester',
       photos:[
         { src:'assets/letters/hester-cat.png', caption:'see you soon', portrait:true }
+      ]
+    },
+    {
+      to:'Happy Birthday, Yssa!',
+      body:'I hope you enjoy your day and spend it with your fam and your loved ones. I am always rooting for you and wishing you endless success in your life and career!\n\nU know what my SHS life wouldn\'t have been half as incredible without you as my partner in crime. Thank you for making those tough school days filled with laughter. You\'re still my bff, and no amount of busy scheds or distance can alter that. Let\'s please plan to get along and catch up again. Can\'t wait to see you! I miss you so much!\n\nAgain, Happy Birthday, Yssa! Mabuhay ka hangga\'t gusto mo! Love yahh! 🥳💗',
+      from:'Jacob',
+      photos:[
+        { src:'assets/letters/jacob-carousel.png', caption:'partner in crime', portrait:true }
+      ]
+    },
+    {
+      to:'Happy birthday anak..',
+      body:'Love you.. Ingat lagi..',
+      from:'Mommy Mai',
+      photos:[
+        { src:'assets/letters/mommy-mai-childhood.png', caption:'my baby', portrait:true },
+        { src:'assets/letters/mommy-mai-cafe.png', caption:'always with you', portrait:true }
       ]
     }
   ];
